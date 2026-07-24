@@ -30,23 +30,53 @@ placeholders.
 
 ## Run it
 
-```bash
-npm install
-npm start
-# open http://localhost:3000
+Everything runs **in the browser** — there's no backend to keep alive and no
+API to hit. Two ways to use it:
+
+**Easiest — just open the file:**
+
 ```
+Open public/index.html in your browser (double-click it).
+```
+
+**Or serve the folder** (any static host works), e.g.:
+
+```bash
+npx serve public      # then open the printed URL
+# or
+npm install && npm start   # → http://localhost:3000
+```
+
+> If you previously saw **"Request failed 404"**, that was the old version
+> calling a `/api/generate` endpoint that only existed when the Node server was
+> running. The generator is now fully client-side, so that can't happen — open
+> `public/index.html` however you like.
 
 ## Config
 
-| Env var | Default | Purpose           |
-| ------- | ------- | ----------------- |
-| `PORT`  | `3000`  | Port to listen on |
+| Env var | Default | Purpose                                    |
+| ------- | ------- | ------------------------------------------ |
+| `PORT`  | `3000`  | Port for the optional static `npm start`   |
 
 ## Project layout
 
 ```
-server.js               Express server + /api/generate (local render)
-lib/render.js           Palette derivation + template substitution + validation
-reference-template.html The proven GHL template (kept verbatim)
-public/                 Dashboard UI (index.html, styles.css, app.js)
+public/
+  index.html            Dashboard UI
+  styles.css            Styles
+  template.js           The proven GHL template, inlined (auto-generated)
+  render.js             Palette derivation + template substitution + validation
+  app.js                Wiring (build / copy / download)
+reference-template.html Source of template.js (kept verbatim)
+server.js               Optional static server (npm start) — not required
+lib/render.js           Node copy of the render logic used by server.js
+```
+
+### Regenerating the inlined template
+
+`public/template.js` is generated from `reference-template.html`. If you edit
+the template, regenerate it:
+
+```bash
+node -e "const fs=require('fs');fs.writeFileSync('public/template.js','window.PTF_TEMPLATE = '+JSON.stringify(fs.readFileSync('reference-template.html','utf8'))+';\n')"
 ```

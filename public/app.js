@@ -34,35 +34,26 @@ function updateOutputButtons() {
   downloadBtn.disabled = !has;
 }
 
-form.addEventListener('submit', async (e) => {
+form.addEventListener('submit', (e) => {
   e.preventDefault();
 
-  generateBtn.disabled = true;
-  setStatus('Building…', '');
+  const data = collectForm();
+  const missing = window.LPGEN.validate(data);
+  if (missing.length) {
+    setStatus('Please fix: ' + missing.join(', ') + '.', 'error');
+    return;
+  }
 
   try {
-    const res = await fetch('/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(collectForm()),
-    });
-
-    if (!res.ok) {
-      let msg = `Request failed (${res.status}).`;
-      try { const j = await res.json(); if (j.error) msg = j.error; } catch (_) {}
-      throw new Error(msg);
-    }
-
-    lastCode = await res.text();
+    // Everything runs in the browser — no server, no network call.
+    lastCode = window.LPGEN.buildLandingPage(data);
     outputCode.classList.remove('placeholder');
     outputCode.textContent = lastCode;
     $('#output').scrollTop = 0;
     updateOutputButtons();
     setStatus('Done. Copy into a GoHighLevel Custom Code element.', '');
   } catch (err) {
-    setStatus(err.message || 'Something went wrong.', 'error');
-  } finally {
-    generateBtn.disabled = false;
+    setStatus((err && err.message) || 'Something went wrong.', 'error');
   }
 });
 
