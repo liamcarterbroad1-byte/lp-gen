@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LP-Gen · Landing Page Generator</title>
+  <title>Liam's Sauce · Sub Landing Page Generator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -12,10 +12,10 @@
 <body>
   <header class="topbar">
     <div class="brand">
-      <span class="logo">LP</span>
+      <span class="logo">LS</span>
       <div>
-        <h1>Landing Page Generator</h1>
-        <p>Fill in the brief → get paste-ready GoHighLevel code. No AI, fully local.</p>
+        <h1>Liam's Sauce</h1>
+        <p>Sub landing page generator — fill in the brief → paste-ready GoHighLevel code. No AI, fully local.</p>
       </div>
     </div>
   </header>
@@ -24,9 +24,18 @@
     <!-- ── INPUT DASHBOARD ── -->
     <section class="panel form-panel">
       <h2>Client brief</h2>
-      <p class="note">Only the fields below affect the output. Body copy (USPs, FAQ, testimonials) keeps the template's Dutch defaults — edit those in the code afterward.</p>
+      <p class="note">The service type rewrites the body copy (hero, USPs, coach, testimonials, FAQ) to match. Other body copy keeps the template's Dutch defaults — fine-tune in the code afterward.</p>
       <form id="briefForm" autocomplete="off">
         <div class="grid">
+          <div class="field full">
+            <label>Service type</label>
+            <div class="segmented" role="radiogroup" aria-label="Service type">
+              <label class="seg"><input type="radio" name="service" value="personal_training"><span>Personal Training</span></label>
+              <label class="seg"><input type="radio" name="service" value="small_group" checked><span>Small Group</span></label>
+              <label class="seg"><input type="radio" name="service" value="online_coaching"><span>Online Coaching</span></label>
+            </div>
+          </div>
+
           <div class="field">
             <label for="clientName">Client / business name <span class="req">*</span></label>
             <input id="clientName" name="clientName" required>

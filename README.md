@@ -1,6 +1,6 @@
-# LP-Gen — Landing Page Generator
+# Liam's Sauce — Sub Landing Page Generator
 
-A small web dashboard that turns a client brief into **paste-ready GoHighLevel
+Liam's Sauce is a web dashboard that turns a client brief into **paste-ready GoHighLevel
 landing page code** — no AI, no API keys, fully local. You fill in the brand
 values (business name, brand color, GHL planner embed, logo/photos, headline,
 address, CTA, roadmap titles) and the app substitutes them into a proven,
@@ -8,8 +8,14 @@ battle-tested template and returns the finished HTML to copy/paste.
 
 ## How it works
 
-1. You fill in the client brief.
-2. The server substitutes your values into `reference-template.html`:
+1. You pick a **service type** and fill in the client brief.
+2. The browser substitutes your values into the template (all in `public/render.js`):
+   - **Service copy** — the template ships as *small group*; choosing **Personal
+     Training** or **Online Coaching** rewrites the service-specific wording
+     across the hero badge/subtext, USP cards, roadmap, coach section,
+     testimonials, FAQ, and final-CTA urgency. For online coaching the studio
+     section is reworded to "train anywhere", and if no address is given the map,
+     address line, and footer address are dropped.
    - **Palette** — a full color scheme (`--ptf-olive` + soft/dark/light/cream
      tints) is derived from your primary hex, and every hardcoded color in the
      CSS, inline SVGs, JS backgrounds, and button gradient is recolored to match.
@@ -17,15 +23,24 @@ battle-tested template and returns the finished HTML to copy/paste.
      (the popup iframe gets a distinct `_popup` id).
    - **Map** — a Google Maps embed is built from the business name + address.
    - **Media / copy** — logo, photos, headline, subtext, funnel-step label,
-     coach tag, CTA text, roadmap step titles, address, and business name.
+     coach tag + auto-derived coach first name, CTA text, roadmap step titles,
+     address, and business name.
 3. You copy the result into a GoHighLevel **Custom Code** element (it's
    paste-ready — no `<!DOCTYPE>`/`<html>`/`<head>`/`<body>`).
 
+### Service types
+
+| Service | Copy |
+| ------- | ---- |
+| **Small Group** | The template's original wording (baseline). |
+| **Personal Training** | 1-op-1 wording throughout; "how private is it" FAQ; studio kept. |
+| **Online Coaching** | Online/remote wording; device-needs FAQ; studio section becomes "train anywhere"; physical blocks dropped when no address. |
+
 ### What is *not* changed
 
-The body copy (USP cards, FAQ answers, testimonial text) stays the template's
-Dutch defaults — these are content decisions, so edit them directly in the
-generated code before going live. The testimonials are intentionally generic
+Copy that isn't service-specific (e.g. the "100% gratis" / "geen verplichtingen"
+badges, generic FAQ answers) stays the template's Dutch defaults — edit those in
+the generated code before going live. Testimonials are intentionally generic
 placeholders.
 
 ## Run it
@@ -62,14 +77,13 @@ npm install && npm start   # → http://localhost:3000
 
 ```
 public/
-  index.html            Dashboard UI
+  index.html            Dashboard UI (service selector + brief)
   styles.css            Styles
   template.js           The proven GHL template, inlined (auto-generated)
-  render.js             Palette derivation + template substitution + validation
+  render.js             Service copy packs + palette + substitution + validation
   app.js                Wiring (build / copy / download)
 reference-template.html Source of template.js (kept verbatim)
 server.js               Optional static server (npm start) — not required
-lib/render.js           Node copy of the render logic used by server.js
 ```
 
 ### Regenerating the inlined template

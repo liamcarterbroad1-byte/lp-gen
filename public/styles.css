@@ -98,6 +98,27 @@ input:focus, textarea:focus {
 textarea { resize: vertical; }
 ::placeholder { color: #6b7382; }
 
+/* ── Segmented control (service type) ── */
+.segmented { display: flex; gap: 8px; flex-wrap: wrap; }
+.seg { flex: 1; min-width: 130px; position: relative; cursor: pointer; margin: 0; }
+.seg input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.seg span {
+  display: block; text-align: center;
+  padding: 11px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-2);
+  font-size: .85rem; font-weight: 700; color: var(--muted);
+  transition: border-color .15s ease, color .15s ease, background .15s ease, box-shadow .15s ease;
+}
+.seg input:checked + span {
+  border-color: var(--accent-soft);
+  color: var(--ink);
+  background: #262b36;
+  box-shadow: 0 0 0 3px rgba(138, 153, 109, .18);
+}
+.seg input:focus-visible + span { border-color: var(--accent-soft); }
+
 .color-row { display: flex; gap: 8px; align-items: center; }
 .color-row input[type="color"] {
   width: 44px; height: 40px; padding: 2px; flex: none; cursor: pointer;
