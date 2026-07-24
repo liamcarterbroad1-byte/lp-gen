@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LP-Gen · Landing Page Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">LP</span>
+      <div>
+        <h1>Landing Page Generator</h1>
+        <p>Your brief in, a paste-ready GoHighLevel page out — built by your own Claude.</p>
+      </div>
+    </div>
+    <div class="key-area">
+      <label for="apiKey">Your Claude API key</label>
+      <div class="key-row">
+        <input type="password" id="apiKey" placeholder="sk-ant-…" autocomplete="off" spellcheck="false">
+        <button type="button" id="toggleKey" class="ghost" title="Show / hide">👁</button>
+      </div>
+      <small id="keyHint">Stored only in your browser. Sent straight to Claude, never saved on the server.</small>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- ── INPUT DASHBOARD ── -->
+    <section class="panel form-panel">
+      <h2>Client brief</h2>
+      <form id="briefForm" autocomplete="off">
+        <div class="grid">
+          <div class="field">
+            <label for="clientName">Client / business name <span class="req">*</span></label>
+            <input id="clientName" name="clientName" required>
+          </div>
+          <div class="field">
+            <label for="businessType">Type of business &amp; what they offer <span class="req">*</span></label>
+            <input id="businessType" name="businessType" placeholder="e.g. small-group fitness studio" required>
+          </div>
+
+          <div class="field">
+            <label for="primaryColor">Primary brand color (hex) <span class="req">*</span></label>
+            <div class="color-row">
+              <input id="primaryColor" name="primaryColor" placeholder="#525A43" required>
+              <input type="color" id="primaryColorPick" value="#525a43" aria-label="Pick color">
+            </div>
+          </div>
+          <div class="field">
+            <label for="otherColors">Other brand colors (optional)</label>
+            <input id="otherColors" name="otherColors" placeholder="or leave blank to derive from primary">
+          </div>
+
+          <div class="field">
+            <label for="logoUrl">Logo URL</label>
+            <input id="logoUrl" name="logoUrl" placeholder="https://…">
+          </div>
+          <div class="field">
+            <label for="coachName">Coach / owner name + role</label>
+            <input id="coachName" name="coachName" placeholder='e.g. "Joep · Oprichter & Coach"'>
+          </div>
+
+          <div class="field">
+            <label for="photo1Url">Photo 1 — atmosphere / group photo URL</label>
+            <input id="photo1Url" name="photo1Url" placeholder="https://…">
+          </div>
+          <div class="field">
+            <label for="photo2Url">Photo 2 — coach / owner photo URL</label>
+            <input id="photo2Url" name="photo2Url" placeholder="https://…">
+          </div>
+
+          <div class="field full">
+            <label for="ghlEmbed">GHL planner embed code (full iframe + script) <span class="req">*</span></label>
+            <textarea id="ghlEmbed" name="ghlEmbed" rows="4" placeholder="Paste the complete iframe + form_embed.js snippet" required></textarea>
+          </div>
+
+          <div class="field full">
+            <label for="offerHeadline">Offer headline (H1) <span class="req">*</span></label>
+            <input id="offerHeadline" name="offerHeadline" placeholder="e.g. Probeer 2 Weken Gratis & Vrijblijvend Small-Group" required>
+          </div>
+          <div class="field full">
+            <label for="offerSubtext">Offer subtext (under H1)</label>
+            <textarea id="offerSubtext" name="offerSubtext" rows="2"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="funnelStep">Funnel step label (top of hero)</label>
+            <input id="funnelStep" name="funnelStep" placeholder='e.g. "Stap 2 · Kies je moment" or "skip"'>
+          </div>
+          <div class="field">
+            <label for="ctaText">Main CTA button text</label>
+            <input id="ctaText" name="ctaText" placeholder="or leave blank to derive from offer">
+          </div>
+
+          <div class="field full roadmap">
+            <label>Roadmap — 4 steps the lead can expect</label>
+            <input name="roadmap1" placeholder="1) …">
+            <input name="roadmap2" placeholder="2) …">
+            <input name="roadmap3" placeholder="3) …">
+            <input name="roadmap4" placeholder="4) …">
+          </div>
+
+          <div class="field full">
+            <label for="address">Business address (street, zip, city)</label>
+            <input id="address" name="address" placeholder="Zuiderkade 3, 1948 NG Beverwijk">
+          </div>
+
+          <div class="field">
+            <label for="language">Language of the page</label>
+            <input id="language" name="language" value="Nederlands">
+          </div>
+          <div class="field">
+            <label for="specialWishes">Special wishes</label>
+            <input id="specialWishes" name="specialWishes" placeholder="or leave blank for none">
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" id="generateBtn" class="primary">Generate landing page →</button>
+          <span id="status" class="status"></span>
+        </div>
+      </form>
+    </section>
+
+    <!-- ── OUTPUT ── -->
+    <section class="panel output-panel">
+      <div class="output-head">
+        <h2>Generated code</h2>
+        <div class="output-actions">
+          <button type="button" id="copyBtn" class="ghost" disabled>Copy</button>
+          <button type="button" id="downloadBtn" class="ghost" disabled>Download .html</button>
+        </div>
+      </div>
+      <pre id="output" class="output"><code id="outputCode" class="placeholder">Fill in the brief and hit Generate. Your Claude will write the page here, live.</code></pre>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
