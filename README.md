@@ -1,24 +1,32 @@
 # LP-Gen — Landing Page Generator
 
-A small web dashboard that connects to **your own Claude** and turns a client
-brief into a **paste-ready GoHighLevel landing page**. You fill in the inputs
-(business name, brand color, GHL planner embed, offer copy, roadmap, …), hit
-Generate, and Claude writes the complete Custom-Code file live in the panel —
-built by adapting a proven, battle-tested template.
+A small web dashboard that turns a client brief into **paste-ready GoHighLevel
+landing page code** — no AI, no API keys, fully local. You fill in the brand
+values (business name, brand color, GHL planner embed, logo/photos, headline,
+address, CTA, roadmap titles) and the app substitutes them into a proven,
+battle-tested template and returns the finished HTML to copy/paste.
 
 ## How it works
 
-1. You paste your Anthropic (Claude) API key in the dashboard. It's stored only
-   in your browser (`localStorage`) and sent straight to Claude via the server —
-   never persisted server-side.
-2. You fill in the client brief.
-3. The server injects your inputs into the proven prompt + reference template and
-   **streams** the generated page back to the browser using your key.
-4. Copy the result into a GoHighLevel **Custom Code** element (no
-   `<!DOCTYPE>`/`<html>`/`<head>`/`<body>` — it's paste-ready as-is).
+1. You fill in the client brief.
+2. The server substitutes your values into `reference-template.html`:
+   - **Palette** — a full color scheme (`--ptf-olive` + soft/dark/light/cream
+     tints) is derived from your primary hex, and every hardcoded color in the
+     CSS, inline SVGs, JS backgrounds, and button gradient is recolored to match.
+   - **Planner** — the iframe `src` + `id` are pulled from your pasted GHL embed
+     (the popup iframe gets a distinct `_popup` id).
+   - **Map** — a Google Maps embed is built from the business name + address.
+   - **Media / copy** — logo, photos, headline, subtext, funnel-step label,
+     coach tag, CTA text, roadmap step titles, address, and business name.
+3. You copy the result into a GoHighLevel **Custom Code** element (it's
+   paste-ready — no `<!DOCTYPE>`/`<html>`/`<head>`/`<body>`).
 
-The heavy lifting (the exact instructions and the battle-tested template that
-must survive untouched) lives in `lib/prompt.js` and `reference-template.html`.
+### What is *not* changed
+
+The body copy (USP cards, FAQ answers, testimonial text) stays the template's
+Dutch defaults — these are content decisions, so edit them directly in the
+generated code before going live. The testimonials are intentionally generic
+placeholders.
 
 ## Run it
 
@@ -28,33 +36,17 @@ npm start
 # open http://localhost:3000
 ```
 
-Then paste your Claude API key (top-right) and fill in the brief.
-
-### Bring-your-own-key vs. server key
-
-By default each user pastes their own key — nothing is stored on the server.
-If you'd rather run a shared key, copy `.env.example` to `.env` and set
-`ANTHROPIC_API_KEY`; it's used as a fallback whenever a request has no key.
-
 ## Config
 
-| Env var             | Default            | Purpose                                  |
-| ------------------- | ------------------ | ---------------------------------------- |
-| `ANTHROPIC_API_KEY` | (unset)            | Optional server-side fallback key        |
-| `PORT`              | `3000`             | Port to listen on                        |
-| `LP_GEN_MODEL`      | `claude-opus-4-8`  | Claude model used for generation         |
+| Env var | Default | Purpose           |
+| ------- | ------- | ----------------- |
+| `PORT`  | `3000`  | Port to listen on |
 
 ## Project layout
 
 ```
-server.js               Express server + streaming /api/generate
-lib/prompt.js           Instructions + INPUTS-block builder + validation
+server.js               Express server + /api/generate (local render)
+lib/render.js           Palette derivation + template substitution + validation
 reference-template.html The proven GHL template (kept verbatim)
 public/                 Dashboard UI (index.html, styles.css, app.js)
 ```
-
-## Notes
-
-- Output streams token-by-token, so long pages appear as they're written.
-- The generated testimonials are intentionally generic placeholders — replace
-  them with real member reviews before going live.

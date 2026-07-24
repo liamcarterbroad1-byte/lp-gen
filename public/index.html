@@ -15,16 +15,8 @@
       <span class="logo">LP</span>
       <div>
         <h1>Landing Page Generator</h1>
-        <p>Your brief in, a paste-ready GoHighLevel page out — built by your own Claude.</p>
+        <p>Fill in the brief → get paste-ready GoHighLevel code. No AI, fully local.</p>
       </div>
-    </div>
-    <div class="key-area">
-      <label for="apiKey">Your Claude API key</label>
-      <div class="key-row">
-        <input type="password" id="apiKey" placeholder="sk-ant-…" autocomplete="off" spellcheck="false">
-        <button type="button" id="toggleKey" class="ghost" title="Show / hide">👁</button>
-      </div>
-      <small id="keyHint">Stored only in your browser. Sent straight to Claude, never saved on the server.</small>
     </div>
   </header>
 
@@ -32,6 +24,7 @@
     <!-- ── INPUT DASHBOARD ── -->
     <section class="panel form-panel">
       <h2>Client brief</h2>
+      <p class="note">Only the fields below affect the output. Body copy (USPs, FAQ, testimonials) keeps the template's Dutch defaults — edit those in the code afterward.</p>
       <form id="briefForm" autocomplete="off">
         <div class="grid">
           <div class="field">
@@ -39,20 +32,11 @@
             <input id="clientName" name="clientName" required>
           </div>
           <div class="field">
-            <label for="businessType">Type of business &amp; what they offer <span class="req">*</span></label>
-            <input id="businessType" name="businessType" placeholder="e.g. small-group fitness studio" required>
-          </div>
-
-          <div class="field">
             <label for="primaryColor">Primary brand color (hex) <span class="req">*</span></label>
             <div class="color-row">
               <input id="primaryColor" name="primaryColor" placeholder="#525A43" required>
               <input type="color" id="primaryColorPick" value="#525a43" aria-label="Pick color">
             </div>
-          </div>
-          <div class="field">
-            <label for="otherColors">Other brand colors (optional)</label>
-            <input id="otherColors" name="otherColors" placeholder="or leave blank to derive from primary">
           </div>
 
           <div class="field">
@@ -75,7 +59,7 @@
 
           <div class="field full">
             <label for="ghlEmbed">GHL planner embed code (full iframe + script) <span class="req">*</span></label>
-            <textarea id="ghlEmbed" name="ghlEmbed" rows="4" placeholder="Paste the complete iframe + form_embed.js snippet" required></textarea>
+            <textarea id="ghlEmbed" name="ghlEmbed" rows="4" placeholder="Paste the complete iframe + form_embed.js snippet — the iframe src &amp; id are pulled from it"></textarea>
           </div>
 
           <div class="field full">
@@ -93,34 +77,25 @@
           </div>
           <div class="field">
             <label for="ctaText">Main CTA button text</label>
-            <input id="ctaText" name="ctaText" placeholder="or leave blank to derive from offer">
+            <input id="ctaText" name="ctaText" placeholder="e.g. Plan je gratis proefperiode">
           </div>
 
           <div class="field full roadmap">
-            <label>Roadmap — 4 steps the lead can expect</label>
-            <input name="roadmap1" placeholder="1) …">
-            <input name="roadmap2" placeholder="2) …">
-            <input name="roadmap3" placeholder="3) …">
-            <input name="roadmap4" placeholder="4) …">
+            <label>Roadmap — 4 step titles (descriptions stay template default)</label>
+            <input name="roadmap1" placeholder="Step 1 title">
+            <input name="roadmap2" placeholder="Step 2 title">
+            <input name="roadmap3" placeholder="Step 3 title">
+            <input name="roadmap4" placeholder="Step 4 title">
           </div>
 
           <div class="field full">
             <label for="address">Business address (street, zip, city)</label>
             <input id="address" name="address" placeholder="Zuiderkade 3, 1948 NG Beverwijk">
           </div>
-
-          <div class="field">
-            <label for="language">Language of the page</label>
-            <input id="language" name="language" value="Nederlands">
-          </div>
-          <div class="field">
-            <label for="specialWishes">Special wishes</label>
-            <input id="specialWishes" name="specialWishes" placeholder="or leave blank for none">
-          </div>
         </div>
 
         <div class="actions">
-          <button type="submit" id="generateBtn" class="primary">Generate landing page →</button>
+          <button type="submit" id="generateBtn" class="primary">Build landing page →</button>
           <span id="status" class="status"></span>
         </div>
       </form>
@@ -135,7 +110,7 @@
           <button type="button" id="downloadBtn" class="ghost" disabled>Download .html</button>
         </div>
       </div>
-      <pre id="output" class="output"><code id="outputCode" class="placeholder">Fill in the brief and hit Generate. Your Claude will write the page here, live.</code></pre>
+      <pre id="output" class="output"><code id="outputCode" class="placeholder">Fill in the brief and hit Build. Your paste-ready GoHighLevel code appears here.</code></pre>
     </section>
   </main>
 
