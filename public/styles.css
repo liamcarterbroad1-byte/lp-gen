@@ -37,6 +37,8 @@ body {
 .brand { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .brand h1 { font-size: 1.15rem; margin: 0; font-weight: 800; }
 .brand p { margin: 2px 0 0; font-size: .82rem; color: var(--muted); }
+.brand-mark { display: inline-flex; align-items: center; }
+.brand-logo { height: 36px; width: auto; display: block; }
 .wordmark {
   font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
   font-weight: 600;

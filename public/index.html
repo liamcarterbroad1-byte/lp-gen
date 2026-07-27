@@ -12,7 +12,13 @@
 <body>
   <header class="topbar">
     <div class="brand">
-      <div class="wordmark" aria-label="BROAD.dev">BROAD<span class="dev">.dev</span></div>
+      <span class="brand-mark">
+        <!-- Precise logo: add public/logo.svg (or logo.png). Until it exists,
+             the serif wordmark below is shown as a fallback. -->
+        <img id="brandLogo" class="brand-logo" src="logo.svg" alt="BROAD.dev"
+             onerror="if(this.dataset.tried!=='png'){this.dataset.tried='png';this.src='logo.png';}else{this.style.display='none';var f=document.getElementById('brandFallback');if(f){f.style.display='inline-block';}}">
+        <span class="wordmark" id="brandFallback" style="display:none" aria-label="BROAD.dev">BROAD<span class="dev">.dev</span></span>
+      </span>
       <div class="brand-divider" aria-hidden="true"></div>
       <div>
         <h1>Liam's Sauce</h1>
