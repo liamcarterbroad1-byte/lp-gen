@@ -5,8 +5,8 @@
   --border: #2a2f3a;
   --ink: #e8eaf0;
   --muted: #9aa2b1;
-  --accent: #6d7a54;
-  --accent-soft: #8a996d;
+  --accent: #204BC2;
+  --accent-soft: #3A63D6;
   --danger: #e5695f;
   --radius: 14px;
   --font: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
@@ -93,7 +93,7 @@ input, textarea, select {
 }
 input:focus, textarea:focus {
   border-color: var(--accent-soft);
-  box-shadow: 0 0 0 3px rgba(138, 153, 109, .18);
+  box-shadow: 0 0 0 3px rgba(58, 99, 214, .25);
 }
 textarea { resize: vertical; }
 ::placeholder { color: #6b7382; }
@@ -115,7 +115,7 @@ textarea { resize: vertical; }
   border-color: var(--accent-soft);
   color: var(--ink);
   background: #262b36;
-  box-shadow: 0 0 0 3px rgba(138, 153, 109, .18);
+  box-shadow: 0 0 0 3px rgba(58, 99, 214, .25);
 }
 .seg input:focus-visible + span { border-color: var(--accent-soft); }
 
