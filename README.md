@@ -16,6 +16,11 @@ battle-tested template and returns the finished HTML to copy/paste.
      4 roadmap steps (each type has its own designed steps). For online coaching
      the studio section is reworded to "train anywhere", and if no address is
      given the map, address line, and footer address are dropped.
+   - **Offer / Guarantee (optional)** — the base page makes **no deal claim**.
+     Enter an **offer** (e.g. "2 weken gratis") to surface it in the hero badge,
+     roadmap step 3, sticky + final CTA notes, and the commitment FAQ. Enter a
+     **guarantee** (e.g. "Niet tevreden? Geld terug") to add a hero shield badge
+     and the final-CTA note. Leave them blank for a clean, deal-free page.
    - **Location** — the studio section ("Onze studio in …") and hero subtext
      follow the **city** parsed from the address you enter; the region-specific
      line is replaced with a neutral one.

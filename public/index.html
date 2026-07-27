@@ -24,7 +24,7 @@
     <!-- ── INPUT DASHBOARD ── -->
     <section class="panel form-panel">
       <h2>Client brief</h2>
-      <p class="note">The service type rewrites the body copy — hero, USPs, coach, testimonials, FAQ, and the 4 roadmap steps — to match. The studio location follows the address you enter. Fine-tune anything else in the code afterward.</p>
+      <p class="note">The service type rewrites the body copy — hero, USPs, coach, testimonials, FAQ, and the 4 roadmap steps — to match. The base page assumes no deal; add an <strong>offer</strong> and/or <strong>guarantee</strong> below to surface them (badge, roadmap step, CTA notes). The studio location follows the address you enter. Fine-tune anything else in the code afterward.</p>
       <form id="briefForm" autocomplete="off">
         <div class="grid">
           <div class="field full">
@@ -99,7 +99,16 @@
           </div>
           <div class="field">
             <label for="ctaText">Main CTA button text</label>
-            <input id="ctaText" name="ctaText" placeholder="e.g. Plan je gratis proefperiode">
+            <input id="ctaText" name="ctaText" placeholder="e.g. Plan je kennismaking">
+          </div>
+
+          <div class="field">
+            <label for="offer">Offer / deal (optional)</label>
+            <input id="offer" name="offer" placeholder="e.g. 2 weken gratis">
+          </div>
+          <div class="field">
+            <label for="guarantee">Guarantee (optional)</label>
+            <input id="guarantee" name="guarantee" placeholder="e.g. Niet tevreden? Geld terug">
           </div>
 
           <div class="field full">

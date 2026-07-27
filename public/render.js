@@ -56,25 +56,32 @@
     { t: 'Exclusieve korting bij aanmelden', d: 'Besluit je door te gaan, dan ontvang je als proefdeelnemer een exclusieve korting op je lidmaatschap.' },
   ];
 
+  // Neutral base roadmaps — no free-trial / discount baked in. When an offer is
+  // entered, step 3 is swapped for it (see applyRoadmap).
   var ROADMAP = {
-    small_group: ROADMAP_ORIG,
+    small_group: [
+      { t: 'Intake', d: 'We bespreken jouw doelen, ervaring en eventuele blessures, zodat je training écht bij jou past.' },
+      { t: 'Proefles', d: 'Ervaar direct hoe het is om te trainen in een kleine groep met persoonlijke aandacht.' },
+      { t: 'Aan de slag', d: 'Je traint mee in een kleine groep, op het moment dat jou uitkomt.' },
+      { t: 'Bereik je doel', d: 'Met vaste momenten en persoonlijke aandacht werk je gericht naar jouw doel.' },
+    ],
     personal_training: [
       { t: 'Kennismaking', d: 'We bespreken jouw doelen, ervaring en blessures, zodat jouw 1-op-1 training perfect aansluit.' },
       { t: 'Proefsessie', d: 'Ervaar direct hoe het is om 1-op-1 te trainen met volledige aandacht voor jouw techniek.' },
-      { t: '2 Weken gratis proberen', d: 'Train twee volle weken gratis mee. Bevalt het niet? Dan stopt het vanzelf — zonder gedoe.' },
-      { t: 'Jouw persoonlijke plan', d: 'Besluit je door te gaan, dan stellen we samen jouw traject op, met een exclusieve startkorting.' },
+      { t: 'Aan de slag', d: 'Je start je 1-op-1 sessies op momenten die jou uitkomen.' },
+      { t: 'Bereik je doel', d: 'Samen werken we gericht toe naar jouw doel, met een plan op maat.' },
     ],
     online_coaching: [
       { t: 'Intake-call', d: 'In een korte online call bespreken we jouw doelen, ervaring en wat je nodig hebt.' },
       { t: 'Persoonlijk schema', d: "Je ontvangt een programma op maat met instructievideo's, direct te starten vanaf je telefoon." },
-      { t: '2 Weken gratis proberen', d: 'Test het programma twee weken gratis. Niet tevreden? Dan stopt het vanzelf.' },
-      { t: 'Blijvende begeleiding', d: 'Ga je door, dan krijg je doorlopende check-ins en bijsturing — met een exclusieve korting.' },
+      { t: 'Aan de slag', d: 'Je start met je persoonlijke programma, direct vanaf je telefoon.' },
+      { t: 'Bereik je doel', d: 'Met doorlopende check-ins en bijsturing werk je gericht naar jouw doel.' },
     ],
     pilates: [
       { t: 'Kennismaking', d: 'We bespreken jouw doelen en eventuele klachten, zodat elke oefening bij jouw lichaam past.' },
       { t: 'Proefles', d: 'Ervaar direct hoe rustig en gecontroleerd Pilates werkt, met persoonlijke correcties.' },
-      { t: '2 Weken gratis proberen', d: 'Volg twee weken gratis mee. Bevalt het niet? Dan stopt het vanzelf — zonder gedoe.' },
-      { t: 'Exclusieve korting bij aanmelden', d: 'Besluit je door te gaan, dan ontvang je als proefdeelnemer een exclusieve korting.' },
+      { t: 'Aan de slag', d: 'Je traint mee in een kleine groep, op het moment dat jou uitkomt.' },
+      { t: 'Bereik je doel', d: 'Met vaste momenten en persoonlijke correcties bouw je rustig op naar jouw doel.' },
     ],
   };
 
@@ -102,7 +109,7 @@
 
     online_coaching: [
       ['Kleine groepen</span>', '100% online</span>'],
-      [BASE.subtext, 'Kies hieronder een moment voor je gratis kennismaking. We bespreken online jouw doelen en je ontvangt direct een bevestiging per mail.'],
+      [BASE.subtext, 'Kies hieronder een moment voor je kennismaking. We bespreken online jouw doelen en je ontvangt direct een bevestiging per mail.'],
       ['Trainen met resultaat, zonder sportschool-gevoel', 'Trainen met resultaat, waar en wanneer jij wilt'],
       ['Small-group training bij PTF By Joep in Beverwijk', 'Online coaching van PTF By Joep'],
       [BASE.usp1, 'Persoonlijke video-feedback, dus élke herhaling wordt gezien en direct bijgestuurd.'],
@@ -262,12 +269,54 @@
     return html;
   }
 
-  function applyRoadmap(html, service) {
-    var steps = ROADMAP[service] || ROADMAP_ORIG;
+  function applyRoadmap(html, service, offer) {
+    var steps = (ROADMAP[service] || ROADMAP['small_group']).slice();
+    // When an offer is entered, step 3 becomes the offer step.
+    if (offer) {
+      steps[2] = { t: escapeHtml(offer), d: 'Ervaar het zelf en ontdek of het bij je past — vrijblijvend en zonder gedoe.' };
+    }
     ROADMAP_ORIG.forEach(function (orig, i) {
       html = replaceAll(html, '<h3>' + orig.t + '</h3>', '<h3>' + steps[i].t + '</h3>');
       html = replaceAll(html, orig.d, steps[i].d);
     });
+    return html;
+  }
+
+  // The base template makes no free-trial / discount claim. An offer or a
+  // guarantee is re-injected only when the user enters one.
+  function applyOfferGuarantee(html, offer, guarantee) {
+    var oe = escapeHtml(offer);
+    var ge = escapeHtml(guarantee);
+
+    // Final-CTA note (compute, then replace) — must run before the badge below
+    // since both contain "100% gratis".
+    var first = offer ? oe : 'Vrijblijvend';
+    var second = guarantee ? ge : 'Geen verplichtingen';
+    html = replaceAll(html, '✓ 100% gratis · ✓ Geen verplichtingen', '✓ ' + first + ' · ✓ ' + second);
+
+    // Hero badge 1
+    html = replaceAll(html, '</svg>100% gratis</span>', '</svg>' + (offer ? oe : 'Persoonlijke aanpak') + '</span>');
+
+    // Sticky CTA
+    html = replaceAll(html, 'Probeer 2 weken gratis', offer ? ('Probeer ' + oe) : 'Plan je kennismaking');
+
+    // Neutralise payment-detail claims (offers vary; don't assume free)
+    html = replaceAll(html, 'Binnen 2 minuten geregeld · Geen betaalgegevens nodig', 'Binnen 2 minuten geregeld · Vrijblijvend');
+    html = replaceAll(html, '✓ Geen betaalgegevens nodig', '✓ Vrijblijvend geregeld');
+
+    // FAQ 1 (about commitment / the deal)
+    var faqQ = offer ? 'Is de actie echt vrijblijvend?' : 'Zit ik ergens aan vast?';
+    var faqA = offer
+      ? ('Ja. ' + oe + ' is volledig vrijblijvend. Je zit nergens aan vast en er wordt niets automatisch verlengd.')
+      : 'Nee. Een kennismaking is volledig vrijblijvend. Je zit nergens aan vast en er wordt niets automatisch verlengd.';
+    html = replaceAll(html, 'Is het echt gratis en vrijblijvend?', faqQ);
+    html = replaceAll(html, 'Ja. Je traint twee weken volledig gratis mee. Je zit nergens aan vast en er wordt niets automatisch verlengd.', faqA);
+
+    // Guarantee badge in the hero (prepended to the badge row)
+    if (guarantee) {
+      var shield = '<span><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 1.5 3 3.2v3.4c0 3 2.1 4.9 5 6 2.9-1.1 5-3 5-6V3.2L8 1.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>' + ge + '</span>';
+      html = replaceAll(html, '<div class="ptf-badges">', '<div class="ptf-badges">' + shield);
+    }
     return html;
   }
 
@@ -281,7 +330,7 @@
       html = replaceAll(html, 'Onze studio in Beverwijk', 'Onze studio');
       html = replaceAll(html, 'in onze studio in Beverwijk', 'in onze studio');
     }
-    html = replaceAll(html, 'Gratis parkeren voor de deur en makkelijk bereikbaar vanuit heel de IJmond.', 'Gratis parkeren voor de deur en goed bereikbaar.');
+    html = replaceAll(html, 'Gratis parkeren voor de deur en makkelijk bereikbaar vanuit heel de IJmond.', 'Goed bereikbaar en makkelijk te vinden.');
     return html;
   }
 
@@ -335,6 +384,8 @@
     var isPhysical = PHYSICAL.indexOf(service) >= 0;
     var address = val('address');
     var clientName = val('clientName');
+    var offer = val('offer');
+    var guarantee = val('guarantee');
 
     // 1. Colors
     var primary = normalizeHex(val('primaryColor'));
@@ -343,9 +394,10 @@
     // 2. Hero subtext (user text wins; else the service default applies next)
     if (val('offerSubtext')) html = replaceAll(html, BASE.subtext, escapeHtml(val('offerSubtext')));
 
-    // 3. Service copy pack + roadmap
+    // 3. Service copy pack + roadmap + optional offer/guarantee
     html = applyServicePack(html, service);
-    html = applyRoadmap(html, service);
+    html = applyRoadmap(html, service, offer);
+    html = applyOfferGuarantee(html, offer, guarantee);
 
     // 4. Location / studio
     if (isPhysical) {
@@ -399,8 +451,8 @@
     // 11. Coach tag (single-coach path)
     if (val('coachName')) html = replaceAll(html, 'Joep · Oprichter &amp; Coach', escapeHtml(val('coachName')));
 
-    // 12. CTA
-    if (val('ctaText')) html = replaceAll(html, 'Plan je gratis proefperiode', escapeHtml(val('ctaText')));
+    // 12. CTA (base is neutral — no free-trial verb unless the user sets one)
+    html = replaceAll(html, 'Plan je gratis proefperiode', val('ctaText') ? escapeHtml(val('ctaText')) : 'Plan je kennismaking');
 
     // 13. Address literal
     if (address) html = replaceAll(html, 'Zuiderkade 3, 1948 NG Beverwijk', escapeHtml(address));
