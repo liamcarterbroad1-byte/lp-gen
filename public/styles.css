@@ -38,7 +38,10 @@ body {
 .brand h1 { font-size: 1.15rem; margin: 0; font-weight: 800; }
 .brand p { margin: 2px 0 0; font-size: .82rem; color: var(--muted); }
 .brand-mark { display: inline-flex; align-items: center; }
-.brand-logo { height: 36px; width: auto; display: block; }
+/* The PNG has transparent padding around the letters; size up + negative
+   margins so the wordmark reads well without inflating the topbar. */
+.brand-logo { height: 60px; width: auto; display: block; margin: -14px 0; }
+@media (max-width: 520px) { .brand-logo { height: 50px; margin: -12px 0; } }
 .wordmark {
   font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
   font-weight: 600;
