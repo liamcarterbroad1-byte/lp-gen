@@ -30,7 +30,9 @@ battle-tested template and returns the finished HTML to copy/paste.
      tints) is derived from your primary hex, and every hardcoded color in the
      CSS, inline SVGs, JS backgrounds, and button gradient is recolored to match.
    - **Planner** — the iframe `src` + `id` are pulled from your pasted GHL embed
-     (the popup iframe gets a distinct `_popup` id).
+     into the inline hero calendar. Every CTA button smooth-scrolls up to that
+     calendar (no popup — a popup iframe didn't resize reliably on mobile and
+     clipped the booking form).
    - **Map** — a Google Maps embed is built from the business name + address.
    - **Media / copy** — logo, photos, headline, subtext, funnel-step label,
      coach tag + auto-derived coach first name, CTA text, address, business name.

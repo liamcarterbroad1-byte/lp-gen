@@ -412,16 +412,12 @@
       html = applyTwoCoaches(html, val('coachName'), val('photo2Url'), val('coach2Name'), val('coach2Photo'));
     }
 
-    // 6. Booking planner
+    // 6. Booking planner (single inline widget in the hero — CTAs scroll to it)
     var embed = parseEmbed(val('ghlEmbed'));
     var ORIG_URL = 'https://api.leadconnectorhq.com/widget/booking/lhumA8v6bLvnQ7v25jYY';
     var ORIG_HERO_ID = 'lhumA8v6bLvnQ7v25jYY_1784898793215';
-    var ORIG_POPUP_ID = 'lhumA8v6bLvnQ7v25jYY_popup';
     if (embed.src) html = replaceAll(html, ORIG_URL, escapeAttr(embed.src));
-    if (embed.id) {
-      html = replaceAll(html, ORIG_POPUP_ID, escapeAttr(embed.id + '_popup'));
-      html = replaceAll(html, ORIG_HERO_ID, escapeAttr(embed.id));
-    }
+    if (embed.id) html = replaceAll(html, ORIG_HERO_ID, escapeAttr(embed.id));
 
     // 7. Map
     var ORIG_MAP = 'https://www.google.com/maps?q=PTF%20by%20Joep%2C%20Zuiderkade%203%2C%201948%20NG%20Beverwijk&z=15&output=embed';
