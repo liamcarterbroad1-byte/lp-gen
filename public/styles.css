@@ -34,16 +34,27 @@ body {
   border-bottom: 1px solid var(--border);
   background: var(--panel);
 }
-.brand { display: flex; align-items: center; gap: 14px; }
+.brand { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .brand h1 { font-size: 1.15rem; margin: 0; font-weight: 800; }
 .brand p { margin: 2px 0 0; font-size: .82rem; color: var(--muted); }
-.logo {
-  width: 42px; height: 42px; flex: none;
-  display: grid; place-items: center;
-  border-radius: 12px;
-  background: linear-gradient(180deg, var(--accent-soft), var(--accent));
-  color: #fff; font-weight: 800; letter-spacing: -.02em;
+.wordmark {
+  font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  font-weight: 600;
+  font-size: 2rem;
+  line-height: 1;
+  letter-spacing: .16em;
+  color: #fff;
+  padding-left: .16em; /* balance the tracking on the left edge */
+  white-space: nowrap;
 }
+.wordmark .dev {
+  font-size: .5em;
+  letter-spacing: .04em;
+  opacity: .8;
+  margin-left: .06em;
+}
+.brand-divider { width: 1px; height: 30px; background: var(--border); flex: none; }
+@media (max-width: 520px) { .brand-divider { display: none; } }
 
 .key-area { min-width: 280px; display: flex; flex-direction: column; gap: 5px; }
 .key-area > label { font-size: .78rem; font-weight: 700; color: var(--muted); }
