@@ -161,16 +161,18 @@ html,body{margin:0!important;padding:0!important;background:#3F4633!important}
 #ptf-modal{position:fixed;inset:0;z-index:99999;display:none;align-items:flex-end;justify-content:center;font-family:'Plus Jakarta Sans',system-ui,sans-serif}
 #ptf-modal.ptf-open{display:flex}
 #ptf-modal .ptf-modal-backdrop{position:absolute;inset:0;background:rgba(20,21,17,.62);backdrop-filter:blur(3px)}
-#ptf-modal .ptf-modal-panel{position:relative;background:#fff;width:100%;max-width:640px;max-height:92dvh;border-radius:22px 22px 0 0;display:flex;flex-direction:column;animation:ptfSlideUp .3s ease}
+#ptf-modal .ptf-modal-panel{position:relative;background:#fff;width:100%;max-width:640px;height:94dvh;max-height:94dvh;border-radius:22px 22px 0 0;display:flex;flex-direction:column;overflow:hidden;animation:ptfSlideUp .3s ease}
 @keyframes ptfSlideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
-#ptf-modal .ptf-modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid #ecefe6}
+#ptf-modal .ptf-modal-head{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid #ecefe6}
 #ptf-modal .ptf-modal-head h3{font-size:1rem;font-weight:800;margin:0;color:#141511}
 #ptf-modal .ptf-modal-close{flex:none;width:36px;height:36px;border-radius:50%;border:none;background:#EDEFE8;color:#141511;font-size:1.1rem;font-weight:700;cursor:pointer;line-height:1}
-#ptf-modal .ptf-modal-body{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:6px 4px 16px}
-#ptf-modal .ptf-modal-body iframe{min-height:620px}
+/* flex:1 + min-height:0 makes the body the scroll region so the whole booking
+   widget (calendar → Continue → contact form) is reachable on mobile */
+#ptf-modal .ptf-modal-body{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:6px 4px calc(24px + env(safe-area-inset-bottom))}
+#ptf-modal .ptf-modal-body iframe{width:100%;border:0;display:block;min-height:640px}
 @media (min-width:640px){
   #ptf-modal{align-items:center;padding:24px}
-  #ptf-modal .ptf-modal-panel{border-radius:22px;max-height:90vh}
+  #ptf-modal .ptf-modal-panel{height:auto;border-radius:22px;max-height:90vh}
 }
 </style>
 
