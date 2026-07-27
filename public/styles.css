@@ -119,6 +119,12 @@ textarea { resize: vertical; }
 }
 .seg input:focus-visible + span { border-color: var(--accent-soft); }
 
+/* ── Two-coach toggle ── */
+.check { display: inline-flex; align-items: center; gap: 8px; font-size: .85rem; font-weight: 700; cursor: pointer; }
+.check input { width: auto; }
+.two-coach { display: none; }
+body.show-two-coach .two-coach { display: flex; }
+
 .color-row { display: flex; gap: 8px; align-items: center; }
 .color-row input[type="color"] {
   width: 44px; height: 40px; padding: 2px; flex: none; cursor: pointer;

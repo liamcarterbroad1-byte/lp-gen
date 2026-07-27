@@ -10,12 +10,17 @@ battle-tested template and returns the finished HTML to copy/paste.
 
 1. You pick a **service type** and fill in the client brief.
 2. The browser substitutes your values into the template (all in `public/render.js`):
-   - **Service copy** — the template ships as *small group*; choosing **Personal
-     Training** or **Online Coaching** rewrites the service-specific wording
-     across the hero badge/subtext, USP cards, roadmap, coach section,
-     testimonials, FAQ, and final-CTA urgency. For online coaching the studio
-     section is reworded to "train anywhere", and if no address is given the map,
-     address line, and footer address are dropped.
+   - **Service copy** — the template ships as *small group*; choosing another
+     type rewrites the service-specific wording across the hero badge/subtext,
+     USP cards, coach section, testimonials, FAQ, final-CTA urgency, and the
+     4 roadmap steps (each type has its own designed steps). For online coaching
+     the studio section is reworded to "train anywhere", and if no address is
+     given the map, address line, and footer address are dropped.
+   - **Location** — the studio section ("Onze studio in …") and hero subtext
+     follow the **city** parsed from the address you enter; the region-specific
+     line is replaced with a neutral one.
+   - **Two coaches** — tick "Two founders / coaches" and add a second name +
+     photo to render two coach cards, a plural heading, and a team paragraph.
    - **Palette** — a full color scheme (`--ptf-olive` + soft/dark/light/cream
      tints) is derived from your primary hex, and every hardcoded color in the
      CSS, inline SVGs, JS backgrounds, and button gradient is recolored to match.
@@ -23,8 +28,7 @@ battle-tested template and returns the finished HTML to copy/paste.
      (the popup iframe gets a distinct `_popup` id).
    - **Map** — a Google Maps embed is built from the business name + address.
    - **Media / copy** — logo, photos, headline, subtext, funnel-step label,
-     coach tag + auto-derived coach first name, CTA text, roadmap step titles,
-     address, and business name.
+     coach tag + auto-derived coach first name, CTA text, address, business name.
 3. You copy the result into a GoHighLevel **Custom Code** element (it's
    paste-ready — no `<!DOCTYPE>`/`<html>`/`<head>`/`<body>`).
 
@@ -35,6 +39,7 @@ battle-tested template and returns the finished HTML to copy/paste.
 | **Small Group** | The template's original wording (baseline). |
 | **Personal Training** | 1-op-1 wording throughout; "how private is it" FAQ; studio kept. |
 | **Online Coaching** | Online/remote wording; device-needs FAQ; studio section becomes "train anywhere"; physical blocks dropped when no address. |
+| **Pilates** | Pilates-flavoured wording (correcties, balans & controle); "do I need experience" FAQ; studio kept. |
 
 ### What is *not* changed
 

@@ -24,7 +24,7 @@
     <!-- ── INPUT DASHBOARD ── -->
     <section class="panel form-panel">
       <h2>Client brief</h2>
-      <p class="note">The service type rewrites the body copy (hero, USPs, coach, testimonials, FAQ) to match. Other body copy keeps the template's Dutch defaults — fine-tune in the code afterward.</p>
+      <p class="note">The service type rewrites the body copy — hero, USPs, coach, testimonials, FAQ, and the 4 roadmap steps — to match. The studio location follows the address you enter. Fine-tune anything else in the code afterward.</p>
       <form id="briefForm" autocomplete="off">
         <div class="grid">
           <div class="field full">
@@ -33,6 +33,7 @@
               <label class="seg"><input type="radio" name="service" value="personal_training"><span>Personal Training</span></label>
               <label class="seg"><input type="radio" name="service" value="small_group" checked><span>Small Group</span></label>
               <label class="seg"><input type="radio" name="service" value="online_coaching"><span>Online Coaching</span></label>
+              <label class="seg"><input type="radio" name="service" value="pilates"><span>Pilates</span></label>
             </div>
           </div>
 
@@ -67,6 +68,18 @@
           </div>
 
           <div class="field full">
+            <label class="check"><input type="checkbox" id="twoCoaches" name="twoCoaches" value="yes"> Two founders / coaches</label>
+          </div>
+          <div class="field two-coach">
+            <label for="coach2Name">Coach 2 — name + role</label>
+            <input id="coach2Name" name="coach2Name" placeholder='e.g. "Sanne · Coach"'>
+          </div>
+          <div class="field two-coach">
+            <label for="coach2Photo">Coach 2 — photo URL</label>
+            <input id="coach2Photo" name="coach2Photo" placeholder="https://…">
+          </div>
+
+          <div class="field full">
             <label for="ghlEmbed">GHL planner embed code (full iframe + script) <span class="req">*</span></label>
             <textarea id="ghlEmbed" name="ghlEmbed" rows="4" placeholder="Paste the complete iframe + form_embed.js snippet — the iframe src &amp; id are pulled from it"></textarea>
           </div>
@@ -87,14 +100,6 @@
           <div class="field">
             <label for="ctaText">Main CTA button text</label>
             <input id="ctaText" name="ctaText" placeholder="e.g. Plan je gratis proefperiode">
-          </div>
-
-          <div class="field full roadmap">
-            <label>Roadmap — 4 step titles (descriptions stay template default)</label>
-            <input name="roadmap1" placeholder="Step 1 title">
-            <input name="roadmap2" placeholder="Step 2 title">
-            <input name="roadmap3" placeholder="Step 3 title">
-            <input name="roadmap4" placeholder="Step 4 title">
           </div>
 
           <div class="field full">

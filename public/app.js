@@ -15,6 +15,12 @@ colorText.addEventListener('input', () => {
   if (/^#[0-9a-fA-F]{6}$/.test(colorText.value.trim())) colorPick.value = colorText.value.trim();
 });
 
+// ── Two-coach fields toggle ──
+const twoCoaches = $('#twoCoaches');
+function syncTwoCoaches() { document.body.classList.toggle('show-two-coach', twoCoaches.checked); }
+twoCoaches.addEventListener('change', syncTwoCoaches);
+syncTwoCoaches();
+
 function setStatus(text, kind) {
   statusEl.textContent = text;
   statusEl.className = 'status' + (kind ? ' ' + kind : '');

@@ -10,6 +10,8 @@
     photo1Url: 'Photo 1 — atmosphere/group photo URL',
     photo2Url: 'Photo 2 — coach/owner photo URL',
     coachName: 'Coach/owner name + role',
+    coach2Name: 'Coach 2 — name + role',
+    coach2Photo: 'Coach 2 — photo URL',
     ghlEmbed: 'GHL planner embed code',
     offerHeadline: 'Offer headline (H1)',
     offerSubtext: 'Offer subtext (under H1)',
@@ -19,7 +21,8 @@
   };
 
   var REQUIRED_FIELDS = ['clientName', 'primaryColor', 'ghlEmbed', 'offerHeadline'];
-  var SERVICES = ['personal_training', 'small_group', 'online_coaching'];
+  var SERVICES = ['personal_training', 'small_group', 'online_coaching', 'pilates'];
+  var PHYSICAL = ['small_group', 'personal_training', 'pilates']; // has a studio
 
   function validate(data) {
     data = data || {};
@@ -33,9 +36,7 @@
     return missing;
   }
 
-  // ── Service-specific copy ───────────────────────────────────────────────────
-  // The template ships as "small group". Each pack rewrites the small-group
-  // defaults into the chosen service's wording. Small group applies nothing.
+  // ── Baseline (small-group) copy the packs rewrite ───────────────────────────
   var BASE = {
     subtext: 'Kies hieronder een moment dat jou uitkomt. Je traint samen in een kleine groep in onze studio in Beverwijk en ontvangt direct een bevestiging per mail.',
     coachPara: 'Bij <strong>PTF By Joep</strong> train je nooit anoniem. Omdat de groepen klein blijven, kent Joep jouw doelen, houdt hij je techniek scherp en past hij de oefeningen aan op jouw niveau. Of je nu net begint of al jaren traint — jij traint op jouw tempo, met begeleiding die je vooruit helpt.',
@@ -45,9 +46,39 @@
     faq4a: 'We trainen bewust in kleine groepen, zodat er altijd persoonlijke aandacht is voor jouw techniek en doelen.',
     usp1: 'Kleine groepen, dus de coach ziet élke herhaling en stuurt direct bij.',
     usp3desc: 'Vaste trainingsmomenten en een stok achter de deur — zo blijf je gaan.',
-    roadmap2desc: 'Ervaar direct hoe het is om te trainen in een kleine groep met persoonlijke aandacht.',
   };
 
+  // ── Roadmap: 4 designed steps per service (no user input) ────────────────────
+  var ROADMAP_ORIG = [
+    { t: 'Intake', d: 'We bespreken jouw doelen, ervaring en eventuele blessures, zodat je training écht bij jou past.' },
+    { t: 'Proefles', d: 'Ervaar direct hoe het is om te trainen in een kleine groep met persoonlijke aandacht.' },
+    { t: '2 Weken gratis &amp; vrijblijvend uitproberen', d: 'Train twee volle weken gratis mee. Bevalt het niet? Dan stopt het vanzelf — zonder gedoe.' },
+    { t: 'Exclusieve korting bij aanmelden', d: 'Besluit je door te gaan, dan ontvang je als proefdeelnemer een exclusieve korting op je lidmaatschap.' },
+  ];
+
+  var ROADMAP = {
+    small_group: ROADMAP_ORIG,
+    personal_training: [
+      { t: 'Kennismaking', d: 'We bespreken jouw doelen, ervaring en blessures, zodat jouw 1-op-1 training perfect aansluit.' },
+      { t: 'Proefsessie', d: 'Ervaar direct hoe het is om 1-op-1 te trainen met volledige aandacht voor jouw techniek.' },
+      { t: '2 Weken gratis proberen', d: 'Train twee volle weken gratis mee. Bevalt het niet? Dan stopt het vanzelf — zonder gedoe.' },
+      { t: 'Jouw persoonlijke plan', d: 'Besluit je door te gaan, dan stellen we samen jouw traject op, met een exclusieve startkorting.' },
+    ],
+    online_coaching: [
+      { t: 'Intake-call', d: 'In een korte online call bespreken we jouw doelen, ervaring en wat je nodig hebt.' },
+      { t: 'Persoonlijk schema', d: "Je ontvangt een programma op maat met instructievideo's, direct te starten vanaf je telefoon." },
+      { t: '2 Weken gratis proberen', d: 'Test het programma twee weken gratis. Niet tevreden? Dan stopt het vanzelf.' },
+      { t: 'Blijvende begeleiding', d: 'Ga je door, dan krijg je doorlopende check-ins en bijsturing — met een exclusieve korting.' },
+    ],
+    pilates: [
+      { t: 'Kennismaking', d: 'We bespreken jouw doelen en eventuele klachten, zodat elke oefening bij jouw lichaam past.' },
+      { t: 'Proefles', d: 'Ervaar direct hoe rustig en gecontroleerd Pilates werkt, met persoonlijke correcties.' },
+      { t: '2 Weken gratis proberen', d: 'Volg twee weken gratis mee. Bevalt het niet? Dan stopt het vanzelf — zonder gedoe.' },
+      { t: 'Exclusieve korting bij aanmelden', d: 'Besluit je door te gaan, dan ontvang je als proefdeelnemer een exclusieve korting.' },
+    ],
+  };
+
+  // ── Service-specific copy packs (small group = baseline, applies nothing) ─────
   var SERVICE_COPY = {
     small_group: [],
 
@@ -59,7 +90,6 @@
       [BASE.usp1, '1-op-1 met je coach, dus élke herhaling wordt gezien en direct bijgestuurd.'],
       ['Samen volhouden', 'Structuur &amp; voortgang'],
       [BASE.usp3desc, 'Vaste afspraken en een coach die je scherp houdt — zo blijf je gaan.'],
-      [BASE.roadmap2desc, 'Ervaar direct hoe het is om 1-op-1 te trainen met volledige aandacht.'],
       ['Persoonlijke aandacht, ook in de groep.', 'Persoonlijke aandacht, elke sessie.'],
       [BASE.coachPara, 'Bij <strong>PTF By Joep</strong> train je nooit anoniem. In jouw 1-op-1 sessies kent Joep jouw doelen, houdt hij je techniek scherp en past hij elke oefening aan op jouw niveau. Of je nu net begint of al jaren traint — jij traint op jouw tempo, met begeleiding die je vooruit helpt.'],
       [BASE.testi1, '"Door de 1-op-1 begeleiding krijg je echt persoonlijke aandacht. Ik voel me fitter én sterker dan ooit."'],
@@ -78,7 +108,6 @@
       [BASE.usp1, 'Persoonlijke video-feedback, dus élke herhaling wordt gezien en direct bijgestuurd.'],
       ['Samen volhouden', 'Structuur &amp; voortgang'],
       [BASE.usp3desc, 'Een vast schema en check-ins die je scherp houden — zo blijf je gaan.'],
-      [BASE.roadmap2desc, 'Ervaar direct hoe online coaching werkt, met persoonlijke aandacht.'],
       ['Persoonlijke aandacht, ook in de groep.', 'Persoonlijke aandacht, ook op afstand.'],
       [BASE.coachPara, 'Bij <strong>PTF By Joep</strong> sta je er nooit alleen voor. Via je persoonlijke online programma kent Joep jouw doelen, houdt hij je techniek scherp en stuurt hij je schema bij op jouw niveau. Of je nu net begint of al jaren traint — jij traint op jouw tempo, waar je ook bent, met begeleiding die je vooruit helpt.'],
       [BASE.testi1, '"Zelfs online krijg je echt persoonlijke begeleiding. Ik voel me fitter én sterker dan ooit."'],
@@ -89,10 +118,26 @@
       ['Hoe groot zijn de groepen?', 'Hoe werkt de begeleiding op afstand?'],
       [BASE.faq4a, "Je krijgt een persoonlijk schema, instructievideo's en regelmatige check-ins, zodat je altijd weet wat je moet doen."],
       ['Plekken per groep zijn beperkt', 'Er zijn beperkt plekken beschikbaar'],
-      // Studio/location section reworded for online (layout kept)
       ['De studio', 'Hoe het werkt'],
       ['Onze studio in Beverwijk', 'Train waar en wanneer jij wilt'],
       ['Gratis parkeren voor de deur en makkelijk bereikbaar vanuit heel de IJmond.', 'Volg je persoonlijke programma thuis, in de sportschool of onderweg — jij bepaalt.'],
+    ],
+
+    pilates: [
+      ['Kleine groepen</span>', 'Voor elk niveau</span>'],
+      [BASE.subtext, 'Kies hieronder een moment dat jou uitkomt. Je traint in een kleine groep in onze studio en ontvangt direct een bevestiging per mail.'],
+      ['Trainen met resultaat, zonder sportschool-gevoel', 'Sterker, soepeler en in balans — met Pilates'],
+      ['Small-group training bij PTF By Joep in Beverwijk', 'Pilates bij PTF By Joep'],
+      [BASE.usp1, 'Kleine groepen, dus de instructeur ziet élke beweging en corrigeert direct.'],
+      ['Samen volhouden', 'Balans &amp; controle'],
+      [BASE.usp3desc, 'Vaste momenten en persoonlijke correcties — zo bouw je rustig en blessurevrij op.'],
+      ['Persoonlijke aandacht, ook in de groep.', 'Persoonlijke aandacht en correcties, elke les.'],
+      [BASE.coachPara, 'Bij <strong>PTF By Joep</strong> train je nooit anoniem. Omdat de groepen klein blijven, kent Joep jouw lichaam en doelen, houdt hij je houding scherp en past hij elke oefening aan op jouw niveau. Of je nu net begint of al jaren traint — jij traint op jouw tempo, met begeleiding die je vooruit helpt.'],
+      [BASE.testi1, '"Door de kleine groep krijg ik echt persoonlijke correcties. Ik voel me sterker én soepeler dan ooit."'],
+      [BASE.testi2, '"De rust en aandacht in de les houden me op de been. Pilates is nu mijn vaste moment."'],
+      ['Hoe groot zijn de groepen?', 'Heb ik ervaring nodig?'],
+      [BASE.faq4a, 'Nee. Pilates is voor elk niveau. We beginnen bij de basis en bouwen rustig op, met persoonlijke correcties.'],
+      ['Plekken per groep zijn beperkt', 'Plekken per les zijn beperkt'],
     ],
   };
 
@@ -110,11 +155,18 @@
     var re = new RegExp(needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
     return hay.replace(re, rep);
   }
-  function firstNameOf(coachName) {
-    // "Mara · Oprichter & Coach" -> "Mara"; "John Smith - Coach" -> "John"
-    var head = String(coachName).split(/[·\-–—,|]/)[0].trim();
-    var tok = head.split(/\s+/)[0];
-    return tok || '';
+  function firstNameOf(name) {
+    var head = String(name || '').split(/[·\-–—,|]/)[0].trim();
+    return head.split(/\s+/)[0] || '';
+  }
+  // Derive the city from a "street, [zip] city" address.
+  function cityOf(address) {
+    if (!address || address.indexOf(',') < 0) return '';
+    var parts = address.split(',');
+    var last = parts[parts.length - 1].trim();
+    last = last.replace(/^\d{4}\s*[A-Za-z]{2}\b\s*/, '').trim(); // strip Dutch postcode
+    if (!last || /\d/.test(last)) return '';
+    return last;
   }
 
   // ── color math ──
@@ -184,21 +236,14 @@
     var urgencyDot = toTint(olive, 80, 0.45);
 
     var hexMap = [
-      ['#3F4633', oliveDark],
-      ['#525A43', olive],
-      ['#5E6750', oliveSoft],
-      ['#47503A', oliveDarker],
-      ['#EDEFE8', oliveLight],
-      ['#FAFAF7', cream],
-      ['#6d7a54', dot],
-      ['#cdd6b8', urgencyDot],
+      ['#3F4633', oliveDark], ['#525A43', olive], ['#5E6750', oliveSoft],
+      ['#47503A', oliveDarker], ['#EDEFE8', oliveLight], ['#FAFAF7', cream],
+      ['#6d7a54', dot], ['#cdd6b8', urgencyDot],
     ];
     hexMap.forEach(function (m) { html = replaceAllCI(html, m[0], m[1]); });
 
     var rgbMap = [
-      ['109,122,84', rgbTriplet(dot)],
-      ['82,90,67', rgbTriplet(olive)],
-      ['63,70,51', rgbTriplet(oliveDark)],
+      ['109,122,84', rgbTriplet(dot)], ['82,90,67', rgbTriplet(olive)], ['63,70,51', rgbTriplet(oliveDark)],
     ];
     rgbMap.forEach(function (m) { html = replaceAll(html, 'rgba(' + m[0] + ',', 'rgba(' + m[1] + ','); });
 
@@ -213,18 +258,71 @@
   }
 
   function applyServicePack(html, service) {
-    var pack = SERVICE_COPY[service] || [];
-    pack.forEach(function (pair) { html = replaceAll(html, pair[0], pair[1]); });
+    (SERVICE_COPY[service] || []).forEach(function (pair) { html = replaceAll(html, pair[0], pair[1]); });
     return html;
   }
 
-  // Online coaching has no physical studio: drop the map card, the address line,
-  // and the footer address when no address was given (the section keeps its
-  // reworded intro text).
+  function applyRoadmap(html, service) {
+    var steps = ROADMAP[service] || ROADMAP_ORIG;
+    ROADMAP_ORIG.forEach(function (orig, i) {
+      html = replaceAll(html, '<h3>' + orig.t + '</h3>', '<h3>' + steps[i].t + '</h3>');
+      html = replaceAll(html, orig.d, steps[i].d);
+    });
+    return html;
+  }
+
+  // Studio location text follows the address entered (physical services only).
+  function applyLocation(html, address) {
+    var city = cityOf(address);
+    if (city) {
+      html = replaceAll(html, 'Onze studio in Beverwijk', 'Onze studio in ' + escapeHtml(city));
+      html = replaceAll(html, 'onze studio in Beverwijk', 'onze studio in ' + escapeHtml(city));
+    } else {
+      html = replaceAll(html, 'Onze studio in Beverwijk', 'Onze studio');
+      html = replaceAll(html, 'in onze studio in Beverwijk', 'in onze studio');
+    }
+    html = replaceAll(html, 'Gratis parkeren voor de deur en makkelijk bereikbaar vanuit heel de IJmond.', 'Gratis parkeren voor de deur en goed bereikbaar.');
+    return html;
+  }
+
+  // Online coaching with no address → drop the map card, address line, footer address.
   function stripPhysicalBlocks(html) {
     html = html.replace(/\s*<div class="ptf-map-card ptf-reveal">[\s\S]*?<\/div>/, '');
     html = html.replace(/\s*<p class="ptf-address">[\s\S]*?<\/p>/, '');
     html = replaceAll(html, '<br>Zuiderkade 3, 1948 NG Beverwijk', '');
+    return html;
+  }
+
+  var COACH_PNG = 'https://assets.cdn.filesafe.space/9fhovZYk1lVT2zNK01rv/media/69bd3dd68944bb8666d93138.png';
+
+  // Replace the single coach card with two coach cards + a team paragraph.
+  function applyTwoCoaches(html, coach1Name, coach1Photo, coach2Name, coach2Photo) {
+    var c1 = firstNameOf(coach1Name) || 'je coach';
+    var c2 = firstNameOf(coach2Name) || 'je coach';
+    var p1 = coach1Photo || COACH_PNG;
+
+    var duo =
+      '<div class="ptf-coach-duo ptf-reveal">' +
+        '<div class="ptf-coach-card">' +
+          '<img class="ptf-coach-img" src="' + escapeAttr(p1) + '" alt="' + escapeAttr(c1) + '" loading="lazy">' +
+          '<span class="ptf-coach-tag">' + escapeHtml(coach1Name) + '</span>' +
+        '</div>' +
+        '<div class="ptf-coach-card">' +
+          '<img class="ptf-coach-img" src="' + escapeAttr(coach2Photo) + '" alt="' + escapeAttr(c2) + '" loading="lazy">' +
+          '<span class="ptf-coach-tag">' + escapeHtml(coach2Name) + '</span>' +
+        '</div>' +
+      '</div>';
+
+    html = html.replace(/<div class="ptf-coach-card ptf-reveal">[\s\S]*?<\/div>/, duo);
+    html = replaceAll(html, '<span class="ptf-kicker ptf-reveal">Jouw coach</span>', '<span class="ptf-kicker ptf-reveal">Jouw coaches</span>');
+    html = replaceAll(html, '<h2 class="ptf-reveal">Train onder begeleiding van Joep</h2>', '<h2 class="ptf-reveal">Train onder begeleiding van ' + escapeHtml(c1) + ' &amp; ' + escapeHtml(c2) + '</h2>');
+
+    var teamPara = '<p class="ptf-coach-text ptf-reveal">Bij <strong>PTF By Joep</strong> train je nooit anoniem. ' +
+      escapeHtml(c1) + ' en ' + escapeHtml(c2) + ' kennen jouw doelen, houden je techniek scherp en passen de training aan op jouw niveau. Of je nu net begint of al jaren traint — jij traint op jouw tempo, met begeleiding die je vooruit helpt.</p>';
+    html = html.replace(/<p class="ptf-coach-text ptf-reveal">[\s\S]*?<\/p>/, teamPara);
+
+    var css = '#ptf-lp .ptf-coach-duo{display:flex;flex-wrap:wrap;gap:30px 16px;justify-content:center;max-width:520px;margin:0 auto 24px}#ptf-lp .ptf-coach-duo .ptf-coach-card{flex:1 1 200px;min-width:180px;max-width:240px;margin:0}';
+    html = html.replace('</style>', css + '</style>');
     return html;
   }
 
@@ -234,6 +332,7 @@
     function val(k) { return data[k] == null ? '' : String(data[k]).trim(); }
 
     var service = SERVICES.indexOf(data.service) >= 0 ? data.service : 'small_group';
+    var isPhysical = PHYSICAL.indexOf(service) >= 0;
     var address = val('address');
     var clientName = val('clientName');
 
@@ -241,16 +340,27 @@
     var primary = normalizeHex(val('primaryColor'));
     if (primary) html = colorize(html, primary);
 
-    // 2. Hero subtext (user text wins; else the service default applies below)
+    // 2. Hero subtext (user text wins; else the service default applies next)
     if (val('offerSubtext')) html = replaceAll(html, BASE.subtext, escapeHtml(val('offerSubtext')));
 
-    // 3. Service copy pack (rewrites remaining small-group defaults)
+    // 3. Service copy pack + roadmap
     html = applyServicePack(html, service);
+    html = applyRoadmap(html, service);
 
-    // 4. Online with no address → remove map + address blocks
-    if (service === 'online_coaching' && !address) html = stripPhysicalBlocks(html);
+    // 4. Location / studio
+    if (isPhysical) {
+      html = applyLocation(html, address);
+    } else if (service === 'online_coaching' && !address) {
+      html = stripPhysicalBlocks(html);
+    }
 
-    // 5. Booking planner
+    // 5. Two coaches (needs coach 1 name, coach 2 name + photo)
+    var twoCoaches = data.twoCoaches === 'yes' || data.twoCoaches === 'on' || data.twoCoaches === true;
+    if (twoCoaches && val('coachName') && val('coach2Name') && val('coach2Photo')) {
+      html = applyTwoCoaches(html, val('coachName'), val('photo2Url'), val('coach2Name'), val('coach2Photo'));
+    }
+
+    // 6. Booking planner
     var embed = parseEmbed(val('ghlEmbed'));
     var ORIG_URL = 'https://api.leadconnectorhq.com/widget/booking/lhumA8v6bLvnQ7v25jYY';
     var ORIG_HERO_ID = 'lhumA8v6bLvnQ7v25jYY_1784898793215';
@@ -261,23 +371,22 @@
       html = replaceAll(html, ORIG_HERO_ID, escapeAttr(embed.id));
     }
 
-    // 6. Map
+    // 7. Map
     var ORIG_MAP = 'https://www.google.com/maps?q=PTF%20by%20Joep%2C%20Zuiderkade%203%2C%201948%20NG%20Beverwijk&z=15&output=embed';
     if (address || clientName) {
       var query = [clientName, address].filter(Boolean).join(', ');
-      var newMap = 'https://www.google.com/maps?q=' + encodeURIComponent(query) + '&z=15&output=embed';
-      html = replaceAll(html, ORIG_MAP, newMap);
+      html = replaceAll(html, ORIG_MAP, 'https://www.google.com/maps?q=' + encodeURIComponent(query) + '&z=15&output=embed');
     }
 
-    // 7. Media
+    // 8. Media
     if (val('logoUrl')) html = replaceAll(html, 'https://www.ptf-by-joep.nl/wp-content/uploads/2024/01/PTF-by-Joep-Logo-150x150.png', escapeAttr(val('logoUrl')));
     if (val('photo1Url')) html = replaceAll(html, 'https://assets.cdn.filesafe.space/9fhovZYk1lVT2zNK01rv/media/69bd39a90e1bdb83c17a64fc.png', escapeAttr(val('photo1Url')));
-    if (val('photo2Url')) html = replaceAll(html, 'https://assets.cdn.filesafe.space/9fhovZYk1lVT2zNK01rv/media/69bd3dd68944bb8666d93138.png', escapeAttr(val('photo2Url')));
+    if (val('photo2Url')) html = replaceAll(html, COACH_PNG, escapeAttr(val('photo2Url')));
 
-    // 8. Headline
+    // 9. Headline
     if (val('offerHeadline')) html = html.replace(/<h1>[\s\S]*?<\/h1>/, '<h1>' + escapeHtml(val('offerHeadline')) + '</h1>');
 
-    // 9. Funnel step
+    // 10. Funnel step
     var funnel = val('funnelStep');
     var EYEBROW = '<span class="ptf-eyebrow">Stap 2 · Kies je trainingsmoment</span>';
     if (funnel && funnel.toLowerCase() !== 'skip') {
@@ -287,26 +396,19 @@
       html = replaceAll(html, EYEBROW, '');
     }
 
-    // 10. Coach tag
+    // 11. Coach tag (single-coach path)
     if (val('coachName')) html = replaceAll(html, 'Joep · Oprichter &amp; Coach', escapeHtml(val('coachName')));
 
-    // 11. CTA
+    // 12. CTA
     if (val('ctaText')) html = replaceAll(html, 'Plan je gratis proefperiode', escapeHtml(val('ctaText')));
-
-    // 12. Roadmap step titles (descriptions come from the service pack)
-    ['Intake', 'Proefles', '2 Weken gratis &amp; vrijblijvend uitproberen', 'Exclusieve korting bij aanmelden'].forEach(function (orig, i) {
-      var step = val('roadmap' + (i + 1));
-      if (step) html = replaceAll(html, '<h3>' + orig + '</h3>', '<h3>' + escapeHtml(step) + '</h3>');
-    });
 
     // 13. Address literal
     if (address) html = replaceAll(html, 'Zuiderkade 3, 1948 NG Beverwijk', escapeHtml(address));
 
-    // 14. Client name (must run before the coach first-name pass so it doesn't
-    //     see the "Joep" inside "PTF By Joep")
+    // 14. Client name (before coach first-name so it doesn't see "PTF By Joep")
     if (clientName) html = replaceAll(html, 'PTF By Joep', escapeHtml(clientName));
 
-    // 15. Coach first name in headings/paragraph (derived from the coach field)
+    // 15. Coach first name in headings/paragraph (single-coach path)
     if (val('coachName')) {
       var fn = firstNameOf(val('coachName'));
       if (fn) html = replaceAll(html, 'Joep', escapeHtml(fn));
