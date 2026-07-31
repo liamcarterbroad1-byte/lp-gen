@@ -45,7 +45,7 @@ battle-tested template and returns the finished HTML to copy/paste.
 | ------- | ---- |
 | **Small Group** | The template's original wording (baseline). |
 | **Personal Training** | 1-op-1 wording throughout; "how private is it" FAQ; studio kept. |
-| **Online Coaching** | Online/remote wording; device-needs FAQ; studio section becomes "train anywhere"; physical blocks dropped when no address. |
+| **Online Coaching** | Online/remote wording; device-needs FAQ; the Google map is replaced by a self-contained "online coaching space" mockup (a brand-colored video-call window) under an online headline ("Jouw coaching, volledig online"). |
 | **Pilates** | Pilates-flavoured wording (correcties, balans & controle); "do I need experience" FAQ; studio kept. |
 
 ### What is *not* changed

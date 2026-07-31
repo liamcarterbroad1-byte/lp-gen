@@ -125,9 +125,9 @@
       ['Hoe groot zijn de groepen?', 'Hoe werkt de begeleiding op afstand?'],
       [BASE.faq4a, "Je krijgt een persoonlijk schema, instructievideo's en regelmatige check-ins, zodat je altijd weet wat je moet doen."],
       ['Plekken per groep zijn beperkt', 'Er zijn beperkt plekken beschikbaar'],
-      ['De studio', 'Hoe het werkt'],
-      ['Onze studio in Beverwijk', 'Train waar en wanneer jij wilt'],
-      ['Gratis parkeren voor de deur en makkelijk bereikbaar vanuit heel de IJmond.', 'Volg je persoonlijke programma thuis, in de sportschool of onderweg — jij bepaalt.'],
+      ['De studio', 'Online coaching'],
+      ['Onze studio in Beverwijk', 'Jouw coaching, volledig online'],
+      ['Gratis parkeren voor de deur en makkelijk bereikbaar vanuit heel de IJmond.', 'Train live met je coach of op je eigen moment — thuis, in de sportschool of onderweg. Alles via één app.'],
     ],
 
     pilates: [
@@ -334,11 +334,49 @@
     return html;
   }
 
-  // Online coaching with no address → drop the map card, address line, footer address.
-  function stripPhysicalBlocks(html) {
-    html = html.replace(/\s*<div class="ptf-map-card ptf-reveal">[\s\S]*?<\/div>/, '');
+  // A self-contained "online coaching space" mockup (a video-call window) that
+  // replaces the Google map for online coaching. Uses the brand CSS variables so
+  // it recolors with the palette. No external assets.
+  var ONLINE_MOCK =
+    '<div class="ptf-online-mock ptf-reveal">' +
+      '<div class="ptf-mock-win">' +
+        '<div class="ptf-mock-bar">' +
+          '<span class="ptf-mock-dots"><i></i><i></i><i></i></span>' +
+          '<span class="ptf-mock-live"><span class="ptf-mock-livedot"></span>LIVE</span>' +
+        '</div>' +
+        '<div class="ptf-mock-stage">' +
+          '<div class="ptf-mock-coach"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8" r="4.2"/><path d="M3.5 21a8.5 8.5 0 0 1 17 0Z"/></svg><span class="ptf-mock-name">Jouw coach</span></div>' +
+          '<div class="ptf-mock-self"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="9" r="3.2"/><path d="M6 20a6 6 0 0 1 12 0Z"/></svg></div>' +
+          '<div class="ptf-mock-ctrls"><span></span><span></span><span class="end"></span></div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+  var ONLINE_MOCK_CSS =
+    '#ptf-lp .ptf-online-mock{max-width:520px;margin:26px auto 0}' +
+    '#ptf-lp .ptf-mock-win{border-radius:20px;overflow:hidden;border:1px solid rgba(20,21,17,.08);box-shadow:0 18px 50px rgba(20,21,17,.16);background:var(--ptf-white)}' +
+    '#ptf-lp .ptf-mock-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--ptf-olive-dark)}' +
+    '#ptf-lp .ptf-mock-dots{display:inline-flex;gap:6px}' +
+    '#ptf-lp .ptf-mock-dots i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.35)}' +
+    '#ptf-lp .ptf-mock-live{display:inline-flex;align-items:center;gap:7px;color:#fff;font-size:.72rem;font-weight:800;letter-spacing:.1em}' +
+    '#ptf-lp .ptf-mock-livedot{width:8px;height:8px;border-radius:50%;background:#ff5b5b}' +
+    '#ptf-lp .ptf-mock-stage{position:relative;aspect-ratio:16/10;background:radial-gradient(120% 100% at 50% 0%,var(--ptf-olive-soft),var(--ptf-olive) 58%,var(--ptf-olive-dark));display:flex;align-items:center;justify-content:center}' +
+    '#ptf-lp .ptf-mock-coach{display:flex;flex-direction:column;align-items:center;gap:12px;color:rgba(255,255,255,.92)}' +
+    '#ptf-lp .ptf-mock-coach svg{width:78px;height:78px;opacity:.92}' +
+    '#ptf-lp .ptf-mock-name{font-size:.8rem;font-weight:700;background:rgba(0,0,0,.22);padding:4px 14px;border-radius:999px;color:#fff}' +
+    '#ptf-lp .ptf-mock-self{position:absolute;top:14px;right:14px;width:78px;height:58px;border-radius:12px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center}' +
+    '#ptf-lp .ptf-mock-self svg{width:32px;height:32px;color:rgba(255,255,255,.82)}' +
+    '#ptf-lp .ptf-mock-ctrls{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);display:inline-flex;gap:12px}' +
+    '#ptf-lp .ptf-mock-ctrls span{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28)}' +
+    '#ptf-lp .ptf-mock-ctrls span.end{background:#ff5b5b;border-color:#ff5b5b}';
+
+  // Online coaching: swap the Google map for the mockup, drop the address line,
+  // and (when no address was given) the footer address too.
+  function applyOnlineSpace(html, hasAddress) {
+    html = html.replace(/<div class="ptf-map-card ptf-reveal">[\s\S]*?<\/div>/, ONLINE_MOCK);
     html = html.replace(/\s*<p class="ptf-address">[\s\S]*?<\/p>/, '');
-    html = replaceAll(html, '<br>Zuiderkade 3, 1948 NG Beverwijk', '');
+    if (!hasAddress) html = replaceAll(html, '<br>Zuiderkade 3, 1948 NG Beverwijk', '');
+    html = html.replace('</style>', ONLINE_MOCK_CSS + '</style>');
     return html;
   }
 
@@ -399,11 +437,11 @@
     html = applyRoadmap(html, service, offer);
     html = applyOfferGuarantee(html, offer, guarantee);
 
-    // 4. Location / studio
+    // 4. Location: physical → city-aware studio text; online → mockup, no map
     if (isPhysical) {
       html = applyLocation(html, address);
-    } else if (service === 'online_coaching' && !address) {
-      html = stripPhysicalBlocks(html);
+    } else if (service === 'online_coaching') {
+      html = applyOnlineSpace(html, !!address);
     }
 
     // 5. Two coaches (needs coach 1 name, coach 2 name + photo)
