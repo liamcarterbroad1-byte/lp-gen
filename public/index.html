@@ -28,11 +28,19 @@
   </header>
 
   <main class="layout">
-    <!-- ── INPUT DASHBOARD ── -->
-    <section class="panel form-panel">
-      <h2>Client brief</h2>
-      <p class="note">The service type rewrites the body copy — hero, USPs, coach, testimonials, FAQ, and the 4 roadmap steps — to match. The base page assumes no deal; add an <strong>offer</strong> and/or <strong>guarantee</strong> below to surface them (badge, roadmap step, CTA notes). The studio location follows the address you enter. Fine-tune anything else in the code afterward.</p>
-      <form id="briefForm" autocomplete="off">
+    <!-- ── EDITOR (left) ── -->
+    <section class="panel editor-panel">
+      <div class="mode-switch">
+        <div class="slide-toggle" id="modeToggle" role="tablist" aria-label="Editor mode">
+          <button type="button" class="seg-btn is-active" data-mode="quick" role="tab">Quick editor</button>
+          <button type="button" class="seg-btn" data-mode="advanced" role="tab">Advanced editor</button>
+          <span class="slide-thumb" aria-hidden="true"></span>
+        </div>
+      </div>
+
+      <div class="editor-scroll">
+      <form id="briefForm" class="mode-pane" data-pane="quick" autocomplete="off">
+        <p class="note">The service type rewrites the body copy to match. The base page assumes no deal; add an <strong>offer</strong> and/or <strong>guarantee</strong> to surface them. The studio location follows the address you enter.</p>
         <div class="grid">
           <div class="field full">
             <label>Service type</label>
@@ -123,45 +131,50 @@
             <input id="address" name="address" placeholder="Zuiderkade 3, 1948 NG Beverwijk">
           </div>
         </div>
-
-        <div class="actions">
-          <button type="submit" id="generateBtn" class="primary">Build landing page →</button>
-          <button type="button" id="detailBtn" class="ghost">Detailed editor</button>
-          <button type="button" id="previewBtn" class="ghost">Preview</button>
-          <span id="status" class="status"></span>
-        </div>
       </form>
 
-      <div id="advPanel" class="adv-panel" hidden>
-        <p class="note">Standard copy is shown below — edit any field to override it. Toggle sections off, or set a section background (use light shades so the text stays readable). Leave a field unchanged to keep the standard text.</p>
+      <div id="advPanel" class="mode-pane" data-pane="advanced" hidden>
+        <p class="note">Standard copy is shown below — edit a field only to override it (leave it to keep the standard). Each section has a <strong>Show</strong> toggle and <strong>Theme / Background / Text</strong> colours. Under Reviews you can switch to a video carousel.</p>
         <div id="advSections"></div>
       </div>
+      </div>
     </section>
 
-    <!-- ── OUTPUT ── -->
-    <section class="panel output-panel">
-      <div class="output-head">
-        <h2>Generated code</h2>
-        <div class="output-actions">
-          <button type="button" id="copyBtn" class="ghost" disabled>Copy</button>
-          <button type="button" id="downloadBtn" class="ghost" disabled>Download .html</button>
+    <!-- ── LIVE PREVIEW (right) ── -->
+    <section class="panel preview-panel">
+      <div class="preview-bar">
+        <span class="preview-title">Live preview</span>
+        <div class="preview-tools">
+          <button type="button" id="pvWidth" class="ghost">Desktop</button>
         </div>
       </div>
-      <pre id="output" class="output"><code id="outputCode" class="placeholder">Fill in the brief and hit Build. Your paste-ready GoHighLevel code appears here.</code></pre>
+
+      <div class="preview-stage" id="previewStage">
+        <div class="preview-frame-wrap" id="previewFrameWrap">
+          <iframe id="livePreview" title="Live preview"></iframe>
+        </div>
+        <div class="preview-empty" id="previewEmpty">Fill in the required fields (name, brand colour, embed, headline) to see your page here.</div>
+
+        <!-- Code view (revealed by the floating island) -->
+        <div class="code-view" id="codeView" hidden>
+          <div class="code-view-head">
+            <strong>Generated code</strong>
+            <div class="code-view-actions">
+              <button type="button" id="copyBtn" class="ghost">Copy</button>
+              <button type="button" id="downloadBtn" class="ghost">Download .html</button>
+              <button type="button" id="backBtn" class="primary">← Back to live preview</button>
+            </div>
+          </div>
+          <pre class="code-out"><code id="outputCode"></code></pre>
+        </div>
+      </div>
+
+      <!-- Floating island → turns into the code view -->
+      <button type="button" id="codeIsland" class="code-island" aria-label="Generate code">
+        <span class="code-island-ico">&lt;/&gt;</span> Generate code
+      </button>
     </section>
   </main>
-
-  <!-- Live preview -->
-  <div id="previewModal" class="pv-modal" hidden>
-    <div class="pv-head">
-      <strong>Live preview</strong>
-      <div class="pv-actions">
-        <button type="button" id="pvWidth" class="ghost">Desktop</button>
-        <button type="button" id="pvClose" class="ghost">Close</button>
-      </div>
-    </div>
-    <div class="pv-body"><iframe id="pvFrame" title="Preview"></iframe></div>
-  </div>
 
   <script src="template.js"></script>
   <script src="render.js"></script>

@@ -39,20 +39,30 @@ battle-tested template and returns the finished HTML to copy/paste.
 3. You copy the result into a GoHighLevel **Custom Code** element (it's
    paste-ready — no `<!DOCTYPE>`/`<html>`/`<head>`/`<body>`).
 
-### Detailed editor, preview & video reviews
+### Live preview, advanced editor & video reviews
 
-Three buttons sit next to **Build**:
+The dashboard is split into an **editor** (left) and an always-on **live
+preview** (right) that re-renders as you type — no build button.
 
-- **Detailed editor** — opens a panel listing every section with its **standard
-  copy** in editable fields. The standard text is always the default; edit a
-  field only to override it (leave it to keep the standard). Each section also
-  has a **Show** toggle (turn the section off) and a **Bg** colour picker
-  (per-section background — use light shades so text stays readable). Under
-  **Reviews** there's a **video review carousel** toggle: tick it and paste
-  video URLs (YouTube, Vimeo, or direct `.mp4`, one per line) to replace the two
-  text testimonials with a swipeable video carousel.
-- **Preview** — renders the generated page live in a phone-width frame (with a
-  Desktop toggle) so you can see edits before copying.
+- **Quick / Advanced slide toggle** (top of the editor) switches between:
+  - **Quick editor** — the client brief (service type, brand values, embed,
+    headline, offer/guarantee, address …).
+  - **Advanced editor** — every section listed with its **standard copy** in
+    editable fields. The standard text is always the default; edit a field only
+    to override it (leave it to keep the standard). Each section has a **Show**
+    toggle (turn the section off) and **Theme / Background / Text** colour
+    pickers — theme recolours that section's accent, background sets its
+    backdrop, text sets its ink (each with a reset ×). Under **Reviews** there's
+    a **video review carousel** toggle: tick it and add a **link box per
+    review** (YouTube, Vimeo, or direct `.mp4`) with add/remove buttons. The
+    reviews render as a **modern centre-focused carousel** — the active review
+    sits centred and full-size with its neighbours peeking in, and the arrow
+    buttons (and dots) rotate to the next one.
+- **Live preview** shows the generated page in a phone-width frame with a
+  **Desktop** toggle.
+- **Floating code island** — a small button at the bottom of the preview.
+  Click it and the preview turns into the **code view** (Copy, Download .html,
+  and **← Back to live preview**) so you can grab the paste-ready GHL code.
 
 All of this runs in the browser via structured DOM edits; the base output is
 untouched unless you actually change something in the editor.
@@ -107,11 +117,11 @@ npm install && npm start   # → http://localhost:3000
 
 ```
 public/
-  index.html            Dashboard UI (service selector + brief)
+  index.html            Dashboard UI (quick/advanced editor + live preview)
   styles.css            Styles
   template.js           The proven GHL template, inlined (auto-generated)
-  render.js             Service copy packs + palette + substitution + validation
-  app.js                Wiring (build / copy / download)
+  render.js             Copy packs + palette + substitution + advanced DOM edits
+  app.js                Wiring (mode toggle / live preview / advanced editor / code)
 reference-template.html Source of template.js (kept verbatim)
 server.js               Optional static server (npm start) — not required
 ```

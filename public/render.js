@@ -583,49 +583,120 @@
     return '<iframe src="' + escapeAttr(u) + '" title="Video review" allowfullscreen loading="lazy"></iframe>';
   }
 
+  // Modern, centre-focused carousel: the active review sits centred and full
+  // size, its neighbours peek in scaled-down and dimmed, and the arrows (or
+  // dots) rotate to the next review. Self-contained CSS + a tiny inline script.
   var VREVIEWS_CSS =
-    '#ptf-lp .ptf-vreviews{position:relative;max-width:560px;margin:0 auto}' +
-    '#ptf-lp .ptf-vtrack{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:4px 2px;scrollbar-width:none}' +
-    '#ptf-lp .ptf-vtrack::-webkit-scrollbar{display:none}' +
-    '#ptf-lp .ptf-vcard{flex:0 0 auto;width:240px;aspect-ratio:9/16;border-radius:18px;overflow:hidden;background:#000;scroll-snap-align:center;box-shadow:0 10px 30px rgba(20,21,17,.14)}' +
+    '#ptf-lp .ptf-vreviews{position:relative;max-width:700px;margin:0 auto;padding:0 8px}' +
+    '#ptf-lp .ptf-vviewport{overflow:hidden;padding:6px 0}' +
+    '#ptf-lp .ptf-vtrack{display:flex;gap:22px;align-items:center;transition:transform .5s cubic-bezier(.22,.61,.36,1);will-change:transform}' +
+    '#ptf-lp .ptf-vcard{flex:0 0 auto;width:258px;aspect-ratio:9/16;border-radius:22px;overflow:hidden;background:#000;box-shadow:0 12px 34px rgba(20,21,17,.16);transform:scale(.8);opacity:.4;transition:transform .5s cubic-bezier(.22,.61,.36,1),opacity .5s ease,box-shadow .5s ease}' +
+    '#ptf-lp .ptf-vcard.is-active{transform:scale(1);opacity:1;box-shadow:0 24px 60px rgba(20,21,17,.30)}' +
     '#ptf-lp .ptf-vcard iframe,#ptf-lp .ptf-vcard video{width:100%;height:100%;border:0;object-fit:cover;display:block}' +
-    '#ptf-lp .ptf-vnav{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:40px;height:40px;border-radius:50%;border:none;background:var(--ptf-white);color:var(--ptf-ink);font-size:1.4rem;line-height:1;cursor:pointer;box-shadow:0 6px 16px rgba(20,21,17,.18)}' +
-    '#ptf-lp .ptf-vprev{left:-6px}#ptf-lp .ptf-vnext{right:-6px}' +
-    '@media(max-width:600px){#ptf-lp .ptf-vnav{display:none}}';
+    '#ptf-lp .ptf-vnav{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:48px;height:48px;border-radius:50%;border:none;background:var(--ptf-olive);color:#fff;font-size:1.6rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(20,21,17,.24);transition:filter .15s ease,transform .12s ease}' +
+    '#ptf-lp .ptf-vnav:hover{filter:brightness(1.09)}' +
+    '#ptf-lp .ptf-vnav:active{transform:translateY(-50%) scale(.93)}' +
+    '#ptf-lp .ptf-vprev{left:-4px}#ptf-lp .ptf-vnext{right:-4px}' +
+    '#ptf-lp .ptf-vdots{display:flex;gap:9px;justify-content:center;margin-top:24px}' +
+    '#ptf-lp .ptf-vdot{width:9px;height:9px;padding:0;border:none;border-radius:50%;cursor:pointer;background:var(--ptf-olive-light);transition:transform .2s ease,background .2s ease}' +
+    '#ptf-lp .ptf-vdot.is-active{background:var(--ptf-olive);transform:scale(1.4)}' +
+    '@media(max-width:560px){#ptf-lp .ptf-vcard{width:200px}#ptf-lp .ptf-vnav{width:40px;height:40px;font-size:1.35rem}}';
+
+  var VREVIEWS_JS =
+    '(function(){function init(){var rs=document.querySelectorAll("#ptf-lp .ptf-vreviews");' +
+    'Array.prototype.forEach.call(rs,function(v){if(v.getAttribute("data-init"))return;v.setAttribute("data-init","1");' +
+    'var track=v.querySelector(".ptf-vtrack"),vp=v.querySelector(".ptf-vviewport");' +
+    'var cards=Array.prototype.slice.call(track.children),dots=Array.prototype.slice.call(v.querySelectorAll(".ptf-vdot"));var i=0;' +
+    'function go(n){i=(n%cards.length+cards.length)%cards.length;' +
+    'cards.forEach(function(c,x){c.classList.toggle("is-active",x===i);});' +
+    'dots.forEach(function(d,x){d.classList.toggle("is-active",x===i);});' +
+    'var c=cards[i];var off=c.offsetLeft+c.offsetWidth/2-vp.clientWidth/2;track.style.transform="translateX("+(-off)+"px)";}' +
+    'var p=v.querySelector(".ptf-vprev"),nx=v.querySelector(".ptf-vnext");' +
+    'if(p)p.addEventListener("click",function(){go(i-1);});if(nx)nx.addEventListener("click",function(){go(i+1);});' +
+    'dots.forEach(function(d,x){d.addEventListener("click",function(){go(x);});});' +
+    'window.addEventListener("resize",function(){go(i);});go(0);});}' +
+    'if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();})();';
 
   function applyVideoCarousel(doc, items) {
     items = (items || []).filter(function (u) { return u && u.trim(); });
     var quotes = doc.querySelector('[data-sec="testimonials"] .ptf-quotes');
     if (!quotes || !items.length) return;
-    var track = doc.createElement('div'); track.className = 'ptf-vtrack';
-    items.forEach(function (u) {
-      var card = doc.createElement('div'); card.className = 'ptf-vcard';
-      card.innerHTML = videoEmbed(u.trim()); track.appendChild(card);
-    });
-    var mk = function (cls, label, dir, glyph) {
-      var b = doc.createElement('button'); b.type = 'button'; b.className = 'ptf-vnav ' + cls;
-      b.setAttribute('aria-label', label); b.textContent = glyph;
-      b.setAttribute('onclick', "this.parentNode.querySelector('.ptf-vtrack').scrollBy({left:" + dir + ",behavior:'smooth'})");
-      return b;
-    };
+
     var wrap = doc.createElement('div'); wrap.className = 'ptf-vreviews ptf-reveal';
-    wrap.appendChild(mk('ptf-vprev', 'Vorige', -300, '‹'));
-    wrap.appendChild(track);
-    wrap.appendChild(mk('ptf-vnext', 'Volgende', 300, '›'));
+
+    var prev = doc.createElement('button');
+    prev.type = 'button'; prev.className = 'ptf-vnav ptf-vprev';
+    prev.setAttribute('aria-label', 'Vorige'); prev.textContent = '‹';
+
+    var next = doc.createElement('button');
+    next.type = 'button'; next.className = 'ptf-vnav ptf-vnext';
+    next.setAttribute('aria-label', 'Volgende'); next.textContent = '›';
+
+    var viewport = doc.createElement('div'); viewport.className = 'ptf-vviewport';
+    var track = doc.createElement('div'); track.className = 'ptf-vtrack';
+    items.forEach(function (u, idx) {
+      var card = doc.createElement('div');
+      card.className = 'ptf-vcard' + (idx === 0 ? ' is-active' : '');
+      card.innerHTML = videoEmbed(u.trim());
+      track.appendChild(card);
+    });
+    viewport.appendChild(track);
+
+    var dots = doc.createElement('div'); dots.className = 'ptf-vdots';
+    if (items.length > 1) {
+      items.forEach(function (_, idx) {
+        var d = doc.createElement('button');
+        d.type = 'button'; d.className = 'ptf-vdot' + (idx === 0 ? ' is-active' : '');
+        d.setAttribute('aria-label', 'Review ' + (idx + 1));
+        dots.appendChild(d);
+      });
+    }
+
+    wrap.appendChild(prev);
+    wrap.appendChild(viewport);
+    wrap.appendChild(next);
+    if (items.length > 1) wrap.appendChild(dots);
     quotes.parentNode.replaceChild(wrap, quotes);
+
     if (!doc.getElementById('ptf-vreviews-css')) {
       var st = doc.createElement('style'); st.id = 'ptf-vreviews-css'; st.textContent = VREVIEWS_CSS;
       doc.head.appendChild(st);
+    }
+    if (!doc.getElementById('ptf-vreviews-js')) {
+      var sc = doc.createElement('script'); sc.id = 'ptf-vreviews-js'; sc.textContent = VREVIEWS_JS;
+      doc.body.appendChild(sc);
     }
   }
 
   function hasAdvanced(a) {
     if (!a) return false;
     if (a.off && Object.keys(a.off).some(function (k) { return a.off[k]; })) return true;
-    if (a.bg && Object.keys(a.bg).some(function (k) { return a.bg[k]; })) return true;
+    if (a.color && Object.keys(a.color).some(function (k) { var c = a.color[k]; return c && (c.theme || c.bg || c.text); })) return true;
     if (a.text && Object.keys(a.text).length) return true;
     if (a.video && a.video.enabled && (a.video.items || []).some(function (u) { return u && u.trim(); })) return true;
     return false;
+  }
+
+  // Per-section colours via scoped CSS variables: theme (accent), background, text.
+  function applySectionColors(doc, colors) {
+    Object.keys(colors).forEach(function (k) {
+      var c = colors[k]; if (!c) return;
+      var el = doc.querySelector('[data-sec="' + k + '"]'); if (!el) return;
+      if (c.bg) el.style.background = c.bg;
+      if (c.text) {
+        el.style.setProperty('--ptf-ink', c.text);
+        el.style.setProperty('--ptf-muted', c.text);
+        el.style.setProperty('--ptf-white', c.text);
+        el.style.color = c.text;
+      }
+      if (c.theme && normalizeHex(c.theme)) {
+        var t = normalizeHex(c.theme);
+        el.style.setProperty('--ptf-olive', t);
+        el.style.setProperty('--ptf-olive-soft', shiftL(t, 6));
+        el.style.setProperty('--ptf-olive-dark', shiftL(t, -12));
+        el.style.setProperty('--ptf-olive-light', toTint(t, 92, 0.30));
+      }
+    });
   }
 
   function postProcess(html, adv) {
@@ -638,13 +709,7 @@
         if (v != null && String(v).length) writeField(el, v);
       });
     }
-    if (adv.bg) {
-      Object.keys(adv.bg).forEach(function (k) {
-        if (!adv.bg[k]) return;
-        var el = doc.querySelector('[data-sec="' + k + '"]');
-        if (el) el.style.background = adv.bg[k];
-      });
-    }
+    if (adv.color) applySectionColors(doc, adv.color);
     if (adv.video && adv.video.enabled) applyVideoCarousel(doc, adv.video.items);
     if (adv.off) {
       Object.keys(adv.off).forEach(function (k) {
