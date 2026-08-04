@@ -500,8 +500,183 @@
       if (fn) html = replaceAll(html, 'Joep', escapeHtml(fn));
     }
 
+    // 16. Advanced (detailed editor) — DOM post-processing, browser only
+    if (typeof DOMParser !== 'undefined' && hasAdvanced(data.advanced)) {
+      html = postProcess(html, data.advanced);
+    }
+
     return html;
   }
 
-  window.LPGEN = { buildLandingPage: buildLandingPage, validate: validate };
+  // ── Detailed editor / advanced post-processing ──────────────────────────────
+  var SECTION_META = {
+    topbar: { label: 'Top bar / logo', toggle: true, bg: true },
+    hero: { label: 'Hero', toggle: false, bg: false },
+    planner: { label: 'Planner (calendar)', toggle: false, bg: false },
+    usps: { label: 'USP cards', toggle: true, bg: true },
+    location: { label: 'Location / studio', toggle: true, bg: true },
+    roadmap: { label: 'Roadmap', toggle: true, bg: true },
+    coach: { label: 'Coach', toggle: true, bg: true },
+    testimonials: { label: 'Reviews', toggle: true, bg: true },
+    faq: { label: 'FAQ', toggle: true, bg: true },
+    finalcta: { label: 'Final CTA', toggle: false, bg: false },
+    footer: { label: 'Footer', toggle: true, bg: true },
+  };
+
+  // Text elements exposed in the editor (skips buttons, icons, images).
+  var FIELD_SEL = 'h1,h2,.ptf-eyebrow,.ptf-kicker,.ptf-sub,.ptf-hero p,.ptf-badges span,.ptf-planner-head,.ptf-microtrust span,.ptf-usp h3,.ptf-usp p,.ptf-roadmap h3,.ptf-roadmap p,.ptf-coach-tag,.ptf-coach-text,.ptf-quote p,.ptf-quote cite,.ptf-faq summary,.ptf-faq details p,.ptf-address,.ptf-btn-note,.ptf-urgency,.ptf-footer p';
+
+  function labelFor(el) {
+    var c = el.classList;
+    if (el.tagName === 'H1' || el.tagName === 'H2') return 'Heading';
+    if (c.contains('ptf-eyebrow')) return 'Eyebrow';
+    if (c.contains('ptf-kicker')) return 'Kicker';
+    if (c.contains('ptf-sub')) return 'Subheading';
+    if (c.contains('ptf-planner-head')) return 'Planner label';
+    if (c.contains('ptf-coach-tag')) return 'Coach tag';
+    if (c.contains('ptf-coach-text')) return 'Coach text';
+    if (c.contains('ptf-address')) return 'Address';
+    if (c.contains('ptf-btn-note')) return 'Button note';
+    if (c.contains('ptf-urgency')) return 'Urgency badge';
+    var p = el.parentElement;
+    if (p && p.classList.contains('ptf-badges')) return 'Badge';
+    if (p && p.classList.contains('ptf-microtrust')) return 'Micro-trust';
+    if (el.closest && el.closest('.ptf-usp')) return el.tagName === 'H3' ? 'USP title' : 'USP text';
+    if (el.closest && el.closest('.ptf-roadmap')) return el.tagName === 'H3' ? 'Step title' : 'Step text';
+    if (el.closest && el.closest('.ptf-quote')) return el.tagName === 'CITE' ? 'Review author' : 'Review quote';
+    if (el.closest && el.closest('.ptf-faq')) return el.tagName === 'SUMMARY' ? 'FAQ question' : 'FAQ answer';
+    if (el.closest && el.closest('.ptf-footer')) return 'Footer';
+    return 'Text';
+  }
+
+  function isDecorative(el) {
+    for (var i = 0; i < el.children.length; i++) {
+      var t = el.children[i].tagName.toLowerCase();
+      if (t !== 'svg' && !el.children[i].classList.contains('ptf-dot') && !el.children[i].classList.contains('ptf-arrow')) return false;
+    }
+    return true;
+  }
+  function readField(el) { return el.textContent.replace(/\s+/g, ' ').trim(); }
+  function writeField(el, value) {
+    if (el.children.length === 0 || !isDecorative(el)) { el.textContent = value; return; }
+    for (var i = el.childNodes.length - 1; i >= 0; i--) {
+      if (el.childNodes[i].nodeType === 3) { el.childNodes[i].textContent = value; return; }
+    }
+    el.appendChild(el.ownerDocument.createTextNode(value));
+  }
+
+  function eachField(root, cb) {
+    var secs = root.querySelectorAll('[data-sec]');
+    for (var s = 0; s < secs.length; s++) {
+      var key = secs[s].getAttribute('data-sec');
+      var els = secs[s].querySelectorAll(FIELD_SEL), i = 0;
+      for (var j = 0; j < els.length; j++) { cb(els[j], key, i); i++; }
+    }
+  }
+
+  function videoEmbed(u) {
+    var yt = u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([\w-]{11})/);
+    if (yt) return '<iframe src="https://www.youtube.com/embed/' + yt[1] + '" title="Video review" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen loading="lazy"></iframe>';
+    var vm = u.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+    if (vm) return '<iframe src="https://player.vimeo.com/video/' + vm[1] + '" title="Video review" allow="autoplay;fullscreen;picture-in-picture" allowfullscreen loading="lazy"></iframe>';
+    if (/\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(u)) return '<video src="' + escapeAttr(u) + '" controls playsinline preload="metadata"></video>';
+    return '<iframe src="' + escapeAttr(u) + '" title="Video review" allowfullscreen loading="lazy"></iframe>';
+  }
+
+  var VREVIEWS_CSS =
+    '#ptf-lp .ptf-vreviews{position:relative;max-width:560px;margin:0 auto}' +
+    '#ptf-lp .ptf-vtrack{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:4px 2px;scrollbar-width:none}' +
+    '#ptf-lp .ptf-vtrack::-webkit-scrollbar{display:none}' +
+    '#ptf-lp .ptf-vcard{flex:0 0 auto;width:240px;aspect-ratio:9/16;border-radius:18px;overflow:hidden;background:#000;scroll-snap-align:center;box-shadow:0 10px 30px rgba(20,21,17,.14)}' +
+    '#ptf-lp .ptf-vcard iframe,#ptf-lp .ptf-vcard video{width:100%;height:100%;border:0;object-fit:cover;display:block}' +
+    '#ptf-lp .ptf-vnav{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:40px;height:40px;border-radius:50%;border:none;background:var(--ptf-white);color:var(--ptf-ink);font-size:1.4rem;line-height:1;cursor:pointer;box-shadow:0 6px 16px rgba(20,21,17,.18)}' +
+    '#ptf-lp .ptf-vprev{left:-6px}#ptf-lp .ptf-vnext{right:-6px}' +
+    '@media(max-width:600px){#ptf-lp .ptf-vnav{display:none}}';
+
+  function applyVideoCarousel(doc, items) {
+    items = (items || []).filter(function (u) { return u && u.trim(); });
+    var quotes = doc.querySelector('[data-sec="testimonials"] .ptf-quotes');
+    if (!quotes || !items.length) return;
+    var track = doc.createElement('div'); track.className = 'ptf-vtrack';
+    items.forEach(function (u) {
+      var card = doc.createElement('div'); card.className = 'ptf-vcard';
+      card.innerHTML = videoEmbed(u.trim()); track.appendChild(card);
+    });
+    var mk = function (cls, label, dir, glyph) {
+      var b = doc.createElement('button'); b.type = 'button'; b.className = 'ptf-vnav ' + cls;
+      b.setAttribute('aria-label', label); b.textContent = glyph;
+      b.setAttribute('onclick', "this.parentNode.querySelector('.ptf-vtrack').scrollBy({left:" + dir + ",behavior:'smooth'})");
+      return b;
+    };
+    var wrap = doc.createElement('div'); wrap.className = 'ptf-vreviews ptf-reveal';
+    wrap.appendChild(mk('ptf-vprev', 'Vorige', -300, '‹'));
+    wrap.appendChild(track);
+    wrap.appendChild(mk('ptf-vnext', 'Volgende', 300, '›'));
+    quotes.parentNode.replaceChild(wrap, quotes);
+    if (!doc.getElementById('ptf-vreviews-css')) {
+      var st = doc.createElement('style'); st.id = 'ptf-vreviews-css'; st.textContent = VREVIEWS_CSS;
+      doc.head.appendChild(st);
+    }
+  }
+
+  function hasAdvanced(a) {
+    if (!a) return false;
+    if (a.off && Object.keys(a.off).some(function (k) { return a.off[k]; })) return true;
+    if (a.bg && Object.keys(a.bg).some(function (k) { return a.bg[k]; })) return true;
+    if (a.text && Object.keys(a.text).length) return true;
+    if (a.video && a.video.enabled && (a.video.items || []).some(function (u) { return u && u.trim(); })) return true;
+    return false;
+  }
+
+  function postProcess(html, adv) {
+    var doc = new DOMParser().parseFromString(html, 'text/html');
+    if (!doc.querySelector('#ptf-lp')) return html;
+
+    if (adv.text) {
+      eachField(doc, function (el, sec, idx) {
+        var v = adv.text[sec + ':' + idx];
+        if (v != null && String(v).length) writeField(el, v);
+      });
+    }
+    if (adv.bg) {
+      Object.keys(adv.bg).forEach(function (k) {
+        if (!adv.bg[k]) return;
+        var el = doc.querySelector('[data-sec="' + k + '"]');
+        if (el) el.style.background = adv.bg[k];
+      });
+    }
+    if (adv.video && adv.video.enabled) applyVideoCarousel(doc, adv.video.items);
+    if (adv.off) {
+      Object.keys(adv.off).forEach(function (k) {
+        if (!adv.off[k]) return;
+        var el = doc.querySelector('[data-sec="' + k + '"]');
+        if (el && el.parentNode) el.parentNode.removeChild(el);
+      });
+    }
+    return doc.head.innerHTML + '\n' + doc.body.innerHTML;
+  }
+
+  // Structure for the editor UI: sections with their editable text fields
+  // (computed from the current standard build, minus any advanced overrides).
+  function describeEditor(data) {
+    if (typeof DOMParser === 'undefined') return [];
+    var d = {}; for (var k in data) if (k !== 'advanced') d[k] = data[k];
+    var doc = new DOMParser().parseFromString(buildLandingPage(d), 'text/html');
+    var out = [];
+    var secs = doc.querySelectorAll('[data-sec]');
+    for (var s = 0; s < secs.length; s++) {
+      var key = secs[s].getAttribute('data-sec');
+      var meta = SECTION_META[key] || { label: key, toggle: true, bg: true };
+      var fields = [], els = secs[s].querySelectorAll(FIELD_SEL);
+      for (var i = 0; i < els.length; i++) fields.push({ id: key + ':' + i, label: labelFor(els[i]), value: readField(els[i]) });
+      out.push({ key: key, label: meta.label, toggle: meta.toggle !== false, bg: meta.bg !== false, fields: fields });
+    }
+    return out;
+  }
+
+  window.LPGEN = {
+    buildLandingPage: buildLandingPage,
+    validate: validate,
+    describeEditor: describeEditor,
+  };
 })();

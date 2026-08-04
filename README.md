@@ -39,6 +39,24 @@ battle-tested template and returns the finished HTML to copy/paste.
 3. You copy the result into a GoHighLevel **Custom Code** element (it's
    paste-ready — no `<!DOCTYPE>`/`<html>`/`<head>`/`<body>`).
 
+### Detailed editor, preview & video reviews
+
+Three buttons sit next to **Build**:
+
+- **Detailed editor** — opens a panel listing every section with its **standard
+  copy** in editable fields. The standard text is always the default; edit a
+  field only to override it (leave it to keep the standard). Each section also
+  has a **Show** toggle (turn the section off) and a **Bg** colour picker
+  (per-section background — use light shades so text stays readable). Under
+  **Reviews** there's a **video review carousel** toggle: tick it and paste
+  video URLs (YouTube, Vimeo, or direct `.mp4`, one per line) to replace the two
+  text testimonials with a swipeable video carousel.
+- **Preview** — renders the generated page live in a phone-width frame (with a
+  Desktop toggle) so you can see edits before copying.
+
+All of this runs in the browser via structured DOM edits; the base output is
+untouched unless you actually change something in the editor.
+
 ### Service types
 
 | Service | Copy |

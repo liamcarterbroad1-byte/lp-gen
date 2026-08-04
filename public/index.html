@@ -126,9 +126,16 @@
 
         <div class="actions">
           <button type="submit" id="generateBtn" class="primary">Build landing page →</button>
+          <button type="button" id="detailBtn" class="ghost">Detailed editor</button>
+          <button type="button" id="previewBtn" class="ghost">Preview</button>
           <span id="status" class="status"></span>
         </div>
       </form>
+
+      <div id="advPanel" class="adv-panel" hidden>
+        <p class="note">Standard copy is shown below — edit any field to override it. Toggle sections off, or set a section background (use light shades so the text stays readable). Leave a field unchanged to keep the standard text.</p>
+        <div id="advSections"></div>
+      </div>
     </section>
 
     <!-- ── OUTPUT ── -->
@@ -143,6 +150,18 @@
       <pre id="output" class="output"><code id="outputCode" class="placeholder">Fill in the brief and hit Build. Your paste-ready GoHighLevel code appears here.</code></pre>
     </section>
   </main>
+
+  <!-- Live preview -->
+  <div id="previewModal" class="pv-modal" hidden>
+    <div class="pv-head">
+      <strong>Live preview</strong>
+      <div class="pv-actions">
+        <button type="button" id="pvWidth" class="ghost">Desktop</button>
+        <button type="button" id="pvClose" class="ghost">Close</button>
+      </div>
+    </div>
+    <div class="pv-body"><iframe id="pvFrame" title="Preview"></iframe></div>
+  </div>
 
   <script src="template.js"></script>
   <script src="render.js"></script>
