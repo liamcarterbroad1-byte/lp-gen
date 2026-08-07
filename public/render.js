@@ -591,8 +591,8 @@
   var VREVIEWS_CSS =
     '#ptf-lp .ptf-vreviews{position:relative;max-width:760px;margin:0 auto;padding:0 48px}' +
     '#ptf-lp .ptf-vstage{position:relative;height:436px;perspective:1500px;overflow:hidden}' +
-    '#ptf-lp .ptf-vcard{position:absolute;top:50%;left:50%;width:244px;height:408px;margin-top:-204px;margin-left:-122px;border-radius:22px;overflow:hidden;background:#000;box-shadow:0 18px 44px rgba(20,21,17,.22);transform-style:preserve-3d;transition:transform .55s cubic-bezier(.22,.61,.36,1),opacity .55s ease,box-shadow .55s ease;cursor:pointer;will-change:transform,opacity}' +
-    '#ptf-lp .ptf-vcard.is-active{cursor:default;box-shadow:0 26px 64px rgba(20,21,17,.34)}' +
+    '#ptf-lp .ptf-vcard{position:absolute;top:50%;left:50%;width:244px;height:408px;margin-top:-204px;margin-left:-122px;border-radius:22px;overflow:hidden;background:#000;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.22,.61,.36,1),opacity .55s ease;cursor:pointer;will-change:transform,opacity}' +
+    '#ptf-lp .ptf-vcard.is-active{cursor:default}' +
     '#ptf-lp .ptf-vcard iframe,#ptf-lp .ptf-vcard video,#ptf-lp .ptf-vcard img{width:100%;height:100%;border:0;object-fit:cover;display:block}' +
     '#ptf-lp .ptf-vnav{position:absolute;top:50%;transform:translateY(-50%);z-index:200;width:48px;height:48px;border-radius:50%;border:none;background:var(--ptf-olive);color:#fff;font-size:1.6rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(20,21,17,.24);transition:filter .15s ease,transform .12s ease}' +
     '#ptf-lp .ptf-vnav:hover{filter:brightness(1.09)}' +
