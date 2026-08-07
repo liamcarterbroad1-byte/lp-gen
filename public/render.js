@@ -583,41 +583,53 @@
     return '<iframe src="' + escapeAttr(u) + '" title="Video review" allowfullscreen loading="lazy"></iframe>';
   }
 
-  // Modern, centre-focused carousel: the active review sits centred and full
-  // size, its neighbours peek in scaled-down and dimmed, and the arrows (or
-  // dots) rotate to the next review. Self-contained CSS + a tiny inline script.
+  // Deck-of-cards carousel: the active review sits centred and full size, with
+  // the neighbouring reviews fanned out smaller, faded and tilted on the left
+  // and right. Arrows / dots (and clicking a side card) rotate the deck.
+  // Self-contained CSS + a tiny inline script; works for video and picture
+  // reviews alike.
   var VREVIEWS_CSS =
-    '#ptf-lp .ptf-vreviews{position:relative;max-width:700px;margin:0 auto;padding:0 8px}' +
-    '#ptf-lp .ptf-vviewport{overflow:hidden;padding:6px 0}' +
-    '#ptf-lp .ptf-vtrack{display:flex;gap:22px;align-items:center;transition:transform .5s cubic-bezier(.22,.61,.36,1);will-change:transform}' +
-    '#ptf-lp .ptf-vcard{flex:0 0 auto;width:258px;aspect-ratio:9/16;border-radius:22px;overflow:hidden;background:#000;box-shadow:0 12px 34px rgba(20,21,17,.16);transform:scale(.8);opacity:.4;transition:transform .5s cubic-bezier(.22,.61,.36,1),opacity .5s ease,box-shadow .5s ease}' +
-    '#ptf-lp .ptf-vcard.is-active{transform:scale(1);opacity:1;box-shadow:0 24px 60px rgba(20,21,17,.30)}' +
-    '#ptf-lp .ptf-vcard iframe,#ptf-lp .ptf-vcard video{width:100%;height:100%;border:0;object-fit:cover;display:block}' +
-    '#ptf-lp .ptf-vnav{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:48px;height:48px;border-radius:50%;border:none;background:var(--ptf-olive);color:#fff;font-size:1.6rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(20,21,17,.24);transition:filter .15s ease,transform .12s ease}' +
+    '#ptf-lp .ptf-vreviews{position:relative;max-width:760px;margin:0 auto;padding:0 48px}' +
+    '#ptf-lp .ptf-vstage{position:relative;height:436px;perspective:1500px;overflow:hidden}' +
+    '#ptf-lp .ptf-vcard{position:absolute;top:50%;left:50%;width:244px;height:408px;margin-top:-204px;margin-left:-122px;border-radius:22px;overflow:hidden;background:#000;box-shadow:0 18px 44px rgba(20,21,17,.22);transform-style:preserve-3d;transition:transform .55s cubic-bezier(.22,.61,.36,1),opacity .55s ease,box-shadow .55s ease;cursor:pointer;will-change:transform,opacity}' +
+    '#ptf-lp .ptf-vcard.is-active{cursor:default;box-shadow:0 26px 64px rgba(20,21,17,.34)}' +
+    '#ptf-lp .ptf-vcard iframe,#ptf-lp .ptf-vcard video,#ptf-lp .ptf-vcard img{width:100%;height:100%;border:0;object-fit:cover;display:block}' +
+    '#ptf-lp .ptf-vnav{position:absolute;top:50%;transform:translateY(-50%);z-index:200;width:48px;height:48px;border-radius:50%;border:none;background:var(--ptf-olive);color:#fff;font-size:1.6rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(20,21,17,.24);transition:filter .15s ease,transform .12s ease}' +
     '#ptf-lp .ptf-vnav:hover{filter:brightness(1.09)}' +
     '#ptf-lp .ptf-vnav:active{transform:translateY(-50%) scale(.93)}' +
-    '#ptf-lp .ptf-vprev{left:-4px}#ptf-lp .ptf-vnext{right:-4px}' +
-    '#ptf-lp .ptf-vdots{display:flex;gap:9px;justify-content:center;margin-top:24px}' +
+    '#ptf-lp .ptf-vprev{left:2px}#ptf-lp .ptf-vnext{right:2px}' +
+    '#ptf-lp .ptf-vdots{display:flex;gap:9px;justify-content:center;margin-top:22px}' +
     '#ptf-lp .ptf-vdot{width:9px;height:9px;padding:0;border:none;border-radius:50%;cursor:pointer;background:var(--ptf-olive-light);transition:transform .2s ease,background .2s ease}' +
     '#ptf-lp .ptf-vdot.is-active{background:var(--ptf-olive);transform:scale(1.4)}' +
-    '@media(max-width:560px){#ptf-lp .ptf-vcard{width:200px}#ptf-lp .ptf-vnav{width:40px;height:40px;font-size:1.35rem}}';
+    '@media(max-width:560px){#ptf-lp .ptf-vreviews{padding:0 38px}#ptf-lp .ptf-vstage{height:344px}#ptf-lp .ptf-vcard{width:184px;height:316px;margin-top:-158px;margin-left:-92px}#ptf-lp .ptf-vnav{width:40px;height:40px;font-size:1.35rem}}';
 
   var VREVIEWS_JS =
     '(function(){function init(){var rs=document.querySelectorAll("#ptf-lp .ptf-vreviews");' +
     'Array.prototype.forEach.call(rs,function(v){if(v.getAttribute("data-init"))return;v.setAttribute("data-init","1");' +
-    'var track=v.querySelector(".ptf-vtrack"),vp=v.querySelector(".ptf-vviewport");' +
-    'var cards=Array.prototype.slice.call(track.children),dots=Array.prototype.slice.call(v.querySelectorAll(".ptf-vdot"));var i=0;' +
-    'function go(n){i=(n%cards.length+cards.length)%cards.length;' +
-    'cards.forEach(function(c,x){c.classList.toggle("is-active",x===i);});' +
-    'dots.forEach(function(d,x){d.classList.toggle("is-active",x===i);});' +
-    'var c=cards[i];var off=c.offsetLeft+c.offsetWidth/2-vp.clientWidth/2;track.style.transform="translateX("+(-off)+"px)";}' +
+    'var stage=v.querySelector(".ptf-vstage");' +
+    'var cards=Array.prototype.slice.call(stage.querySelectorAll(".ptf-vcard")),dots=Array.prototype.slice.call(v.querySelectorAll(".ptf-vdot"));var i=0,n=cards.length;' +
+    'function place(){var off=Math.min(178,stage.clientWidth*0.34);' +
+    'cards.forEach(function(c,x){var d=x-i;if(d>n/2)d-=n;if(d<-n/2)d+=n;var ad=Math.abs(d);' +
+    'var s=Math.max(0.64,1-ad*0.16);var op=ad===0?1:ad===1?0.6:ad===2?0.26:0;' +
+    'c.style.transform="translateX("+(d*off)+"px) scale("+s+") rotateY("+(d*-7)+"deg)";' +
+    'c.style.opacity=op;c.style.zIndex=String(100-ad);c.style.pointerEvents=ad>2?"none":"auto";' +
+    'c.classList.toggle("is-active",ad===0);});' +
+    'dots.forEach(function(d2,x){d2.classList.toggle("is-active",x===i);});}' +
+    'function go(m){i=(m%n+n)%n;place();}' +
     'var p=v.querySelector(".ptf-vprev"),nx=v.querySelector(".ptf-vnext");' +
     'if(p)p.addEventListener("click",function(){go(i-1);});if(nx)nx.addEventListener("click",function(){go(i+1);});' +
-    'dots.forEach(function(d,x){d.addEventListener("click",function(){go(x);});});' +
-    'window.addEventListener("resize",function(){go(i);});go(0);});}' +
+    'cards.forEach(function(c,x){c.addEventListener("click",function(){if(x!==i)go(x);});});' +
+    'dots.forEach(function(d2,x){d2.addEventListener("click",function(){go(x);});});' +
+    'window.addEventListener("resize",place);place();});}' +
     'if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();})();';
 
-  function applyVideoCarousel(doc, items) {
+  function mediaCard(u, kind) {
+    if (kind === 'picture') return '<img src="' + escapeAttr(u) + '" alt="Review" loading="lazy">';
+    return videoEmbed(u);
+  }
+
+  // Replace the two text quotes with a deck-of-cards carousel of media reviews.
+  function applyMediaCarousel(doc, items, kind) {
     items = (items || []).filter(function (u) { return u && u.trim(); });
     var quotes = doc.querySelector('[data-sec="testimonials"] .ptf-quotes');
     if (!quotes || !items.length) return;
@@ -632,15 +644,13 @@
     next.type = 'button'; next.className = 'ptf-vnav ptf-vnext';
     next.setAttribute('aria-label', 'Volgende'); next.textContent = '›';
 
-    var viewport = doc.createElement('div'); viewport.className = 'ptf-vviewport';
-    var track = doc.createElement('div'); track.className = 'ptf-vtrack';
+    var stage = doc.createElement('div'); stage.className = 'ptf-vstage';
     items.forEach(function (u, idx) {
       var card = doc.createElement('div');
       card.className = 'ptf-vcard' + (idx === 0 ? ' is-active' : '');
-      card.innerHTML = videoEmbed(u.trim());
-      track.appendChild(card);
+      card.innerHTML = mediaCard(u.trim(), kind);
+      stage.appendChild(card);
     });
-    viewport.appendChild(track);
 
     var dots = doc.createElement('div'); dots.className = 'ptf-vdots';
     if (items.length > 1) {
@@ -653,7 +663,7 @@
     }
 
     wrap.appendChild(prev);
-    wrap.appendChild(viewport);
+    wrap.appendChild(stage);
     wrap.appendChild(next);
     if (items.length > 1) wrap.appendChild(dots);
     quotes.parentNode.replaceChild(wrap, quotes);
@@ -673,8 +683,15 @@
     if (a.off && Object.keys(a.off).some(function (k) { return a.off[k]; })) return true;
     if (a.color && Object.keys(a.color).some(function (k) { var c = a.color[k]; return c && (c.theme || c.bg || c.text); })) return true;
     if (a.text && Object.keys(a.text).length) return true;
-    if (a.video && a.video.enabled && (a.video.items || []).some(function (u) { return u && u.trim(); })) return true;
+    if (reviewItems(a.reviews).length) return true;
     return false;
+  }
+
+  // The active media list for the current reviews mode (empty for quotes).
+  function reviewItems(r) {
+    if (!r || !r.mode || r.mode === 'quote') return [];
+    var arr = r.mode === 'videos' ? r.videos : (r.mode === 'pictures' ? r.pictures : []);
+    return (arr || []).filter(function (u) { return u && u.trim(); });
   }
 
   // Per-section colours via scoped CSS variables: theme (accent), background, text.
@@ -710,7 +727,9 @@
       });
     }
     if (adv.color) applySectionColors(doc, adv.color);
-    if (adv.video && adv.video.enabled) applyVideoCarousel(doc, adv.video.items);
+    if (adv.reviews && reviewItems(adv.reviews).length) {
+      applyMediaCarousel(doc, reviewItems(adv.reviews), adv.reviews.mode === 'videos' ? 'video' : 'picture');
+    }
     if (adv.off) {
       Object.keys(adv.off).forEach(function (k) {
         if (!adv.off[k]) return;

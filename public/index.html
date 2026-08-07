@@ -130,11 +130,22 @@
             <label for="address">Business address (street, zip, city)</label>
             <input id="address" name="address" placeholder="Zuiderkade 3, 1948 NG Beverwijk">
           </div>
+
+          <div class="field full">
+            <label>Reviews</label>
+            <div class="slide-toggle tri" id="reviewMode" role="tablist" aria-label="Review type">
+              <button type="button" class="seg-btn is-active" data-rmode="quote" role="tab">Quotes</button>
+              <button type="button" class="seg-btn" data-rmode="pictures" role="tab">Pictures</button>
+              <button type="button" class="seg-btn" data-rmode="videos" role="tab">Videos</button>
+              <span class="slide-thumb" aria-hidden="true"></span>
+            </div>
+            <div id="reviewMedia"></div>
+          </div>
         </div>
       </form>
 
       <div id="advPanel" class="mode-pane" data-pane="advanced" hidden>
-        <p class="note">Standard copy is shown below — edit a field only to override it (leave it to keep the standard). Each section has a <strong>Show</strong> toggle and <strong>Theme / Background / Text</strong> colours. Under Reviews you can switch to a video carousel.</p>
+        <p class="note">Standard copy is shown below — edit a field only to override it (leave it to keep the standard). Each section has a <strong>Show</strong> toggle and <strong>Theme / Background / Text</strong> colours. Switch reviews to pictures or videos in the <strong>Quick editor</strong>.</p>
         <div id="advSections"></div>
       </div>
       </div>

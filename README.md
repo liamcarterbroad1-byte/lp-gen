@@ -46,18 +46,21 @@ preview** (right) that re-renders as you type — no build button.
 
 - **Quick / Advanced slide toggle** (top of the editor) switches between:
   - **Quick editor** — the client brief (service type, brand values, embed,
-    headline, offer/guarantee, address …).
+    headline, offer/guarantee, address …) plus a **Reviews** control: a
+    three-way slide toggle for **Quotes** (standard), **Pictures** or
+    **Videos**. Pick Pictures or Videos and add a **link box per review**
+    (image URLs, or YouTube / Vimeo / `.mp4`) with add/remove buttons; each
+    mode keeps its own list. The media reviews render as a **deck-of-cards
+    carousel** — the active review sits centred and full-size while the
+    neighbours fan out smaller, faded and tilted on the left and right, and the
+    arrows / dots (or clicking a side card) rotate the deck. Leave it on Quotes
+    to keep the two standard text testimonials.
   - **Advanced editor** — every section listed with its **standard copy** in
     editable fields. The standard text is always the default; edit a field only
     to override it (leave it to keep the standard). Each section has a **Show**
     toggle (turn the section off) and **Theme / Background / Text** colour
     pickers — theme recolours that section's accent, background sets its
-    backdrop, text sets its ink (each with a reset ×). Under **Reviews** there's
-    a **video review carousel** toggle: tick it and add a **link box per
-    review** (YouTube, Vimeo, or direct `.mp4`) with add/remove buttons. The
-    reviews render as a **modern centre-focused carousel** — the active review
-    sits centred and full-size with its neighbours peeking in, and the arrow
-    buttons (and dots) rotate to the next one.
+    backdrop, text sets its ink (each with a reset ×).
 - **Live preview** shows the generated page in a phone-width frame with a
   **Desktop** toggle.
 - **Floating code island** — a small button at the bottom of the preview.

@@ -18,7 +18,9 @@ syncTwoCoaches();
 
 // ── Advanced / detailed editor state ──
 // color[section] = { theme?, bg?, text? } — each an optional hex override.
-const advanced = { off: {}, color: {}, text: {}, video: { enabled: false, items: [] } };
+// reviews.mode: 'quote' (standard) | 'pictures' | 'videos'; each mode keeps
+// its own list of URLs so switching back and forth doesn't lose them.
+const advanced = { off: {}, color: {}, text: {}, reviews: { mode: 'quote', pictures: [], videos: [] } };
 
 function baseData() {
   const data = {};
@@ -140,70 +142,6 @@ function colorControl(key, prop, label) {
   return wrap;
 }
 
-function videoReviewBox() {
-  const box = el('div', 'adv-video');
-  const lbl = el('label', 'check');
-  const cb = document.createElement('input');
-  cb.type = 'checkbox'; cb.checked = advanced.video.enabled;
-  const list = el('div', 'vrev-list');
-  const add = el('button', 'vrev-add', '+ Add a review');
-  add.type = 'button';
-
-  function syncEnabled() {
-    list.style.display = advanced.video.enabled ? '' : 'none';
-    add.style.display = advanced.video.enabled ? '' : 'none';
-  }
-  function renumber() {
-    list.querySelectorAll('.vrev-row').forEach((row, i) => { row.querySelector('.vrev-num').textContent = (i + 1); });
-  }
-  function addRow(value) {
-    const idx = advanced.video.items.length;
-    advanced.video.items[idx] = value || '';
-    const row = el('div', 'vrev-row');
-    row.appendChild(el('span', 'vrev-num', String(idx + 1)));
-    const inp = document.createElement('input');
-    inp.type = 'url'; inp.placeholder = 'YouTube, Vimeo or .mp4 URL';
-    inp.value = value || '';
-    inp.addEventListener('input', () => {
-      const pos = Array.prototype.indexOf.call(list.children, row);
-      advanced.video.items[pos] = inp.value.trim();
-      schedulePreview();
-    });
-    const del = el('button', 'vrev-del', '×');
-    del.type = 'button'; del.title = 'Remove review';
-    del.addEventListener('click', () => {
-      const pos = Array.prototype.indexOf.call(list.children, row);
-      advanced.video.items.splice(pos, 1);
-      row.remove();
-      renumber();
-      schedulePreview();
-    });
-    row.appendChild(inp); row.appendChild(del);
-    list.appendChild(row);
-    renumber();
-  }
-
-  lbl.appendChild(cb);
-  lbl.appendChild(document.createTextNode(' Use a video review carousel instead'));
-  box.appendChild(lbl);
-  box.appendChild(list);
-  box.appendChild(add);
-
-  cb.addEventListener('change', () => {
-    advanced.video.enabled = cb.checked;
-    if (cb.checked && !advanced.video.items.length) addRow('');
-    syncEnabled();
-    schedulePreview();
-  });
-  add.addEventListener('click', () => { addRow(''); schedulePreview(); });
-
-  advanced.video.items.forEach((u) => addRow(u));
-  // addRow duplicated the items into the array; rebuild it from the inputs.
-  advanced.video.items = Array.prototype.map.call(list.querySelectorAll('input'), (i) => i.value.trim());
-  syncEnabled();
-  return box;
-}
-
 function renderEditor() {
   let structure;
   try { structure = window.LPGEN.describeEditor(baseData()); }
@@ -255,14 +193,89 @@ function renderEditor() {
       fields.appendChild(row);
     });
 
-    // The video-review carousel controls live under the Reviews section.
-    if (sec.key === 'testimonials') fields.appendChild(videoReviewBox());
-
     card.appendChild(fields);
     advSections.appendChild(card);
   });
   editorBuilt = true;
 }
+
+// ── Reviews: Quotes / Pictures / Videos (quick editor) ───────────────────────
+const reviewMode = $('#reviewMode');
+const reviewMedia = $('#reviewMedia');
+const REVIEW_HINT = {
+  pictures: 'Add one image URL per review (jpg, png, webp). Portrait images work best.',
+  videos: 'Add one video URL per review — YouTube, Vimeo or a direct .mp4.',
+};
+const REVIEW_PLACEHOLDER = {
+  pictures: 'https://…/review.jpg',
+  videos: 'YouTube, Vimeo or .mp4 URL',
+};
+
+function mediaListEditor(kind) {
+  // kind: 'pictures' | 'videos' — edits advanced.reviews[kind] in place.
+  const items = advanced.reviews[kind];
+  const box = el('div', 'adv-video');
+  box.appendChild(el('p', 'vrev-hint', REVIEW_HINT[kind]));
+  const list = el('div', 'vrev-list');
+  const add = el('button', 'vrev-add', '+ Add a review');
+  add.type = 'button';
+
+  function renumber() {
+    list.querySelectorAll('.vrev-row').forEach((row, i) => { row.querySelector('.vrev-num').textContent = (i + 1); });
+  }
+  function addRow(value) {
+    const row = el('div', 'vrev-row');
+    row.appendChild(el('span', 'vrev-num', ''));
+    const inp = document.createElement('input');
+    inp.type = 'url'; inp.placeholder = REVIEW_PLACEHOLDER[kind];
+    inp.value = value || '';
+    inp.addEventListener('input', () => {
+      const pos = Array.prototype.indexOf.call(list.children, row);
+      items[pos] = inp.value.trim();
+      schedulePreview();
+    });
+    const del = el('button', 'vrev-del', '×');
+    del.type = 'button'; del.title = 'Remove review';
+    del.addEventListener('click', () => {
+      const pos = Array.prototype.indexOf.call(list.children, row);
+      items.splice(pos, 1);
+      row.remove();
+      renumber();
+      schedulePreview();
+    });
+    row.appendChild(inp); row.appendChild(del);
+    list.appendChild(row);
+    renumber();
+  }
+
+  items.forEach((u) => addRow(u));
+  if (!items.length) { addRow(''); items.push(''); }
+
+  add.addEventListener('click', () => { items.push(''); addRow(''); schedulePreview(); });
+  box.appendChild(list);
+  box.appendChild(add);
+  return box;
+}
+
+function renderReviewMedia() {
+  reviewMedia.innerHTML = '';
+  const mode = advanced.reviews.mode;
+  if (mode === 'pictures' || mode === 'videos') {
+    reviewMedia.appendChild(mediaListEditor(mode));
+  }
+}
+
+reviewMode.addEventListener('click', (e) => {
+  const btn = e.target.closest('.seg-btn');
+  if (!btn) return;
+  const mode = btn.dataset.rmode;
+  advanced.reviews.mode = mode;
+  reviewMode.querySelectorAll('.seg-btn').forEach((b) => b.classList.toggle('is-active', b === btn));
+  reviewMode.classList.remove('rm-quote', 'rm-pictures', 'rm-videos');
+  reviewMode.classList.add('rm-' + mode);
+  renderReviewMedia();
+  schedulePreview();
+});
 
 // ── Floating code island ⇄ code view ─────────────────────────────────────────
 const codeIsland = $('#codeIsland');
@@ -322,4 +335,5 @@ pvWidth.addEventListener('click', () => {
 });
 
 // Initial render.
+renderReviewMedia();
 renderPreview();

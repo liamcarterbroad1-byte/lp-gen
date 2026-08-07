@@ -109,6 +109,12 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 .slide-toggle.is-advanced .slide-thumb { transform: translateX(100%); }
 .mode-pane[hidden] { display: none; }
 
+/* 3-way slide toggle (review type) */
+.slide-toggle.tri { grid-template-columns: 1fr 1fr 1fr; }
+.slide-toggle.tri .slide-thumb { width: calc(33.333% - 2.67px); }
+.slide-toggle.tri.rm-pictures .slide-thumb { transform: translateX(100%); }
+.slide-toggle.tri.rm-videos .slide-thumb { transform: translateX(200%); }
+
 .note { margin: 0 0 16px; font-size: .78rem; color: var(--muted); line-height: 1.5; }
 
 /* Preview pane */
@@ -247,8 +253,10 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .adv-field > span { font-size: .72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
 .adv-field input, .adv-field textarea { font-size: .85rem; }
 
-/* Video-review carousel controls (per-review link boxes) */
-.adv-video { margin-top: 8px; padding-top: 12px; border-top: 1px dashed var(--border); display: grid; gap: 10px; }
+/* Review media (picture / video) link boxes — one box per review */
+#reviewMedia { margin-top: 10px; display: grid; gap: 10px; }
+#reviewMedia:empty { margin-top: 0; }
+.vrev-hint { margin: 0; font-size: .74rem; color: var(--muted); }
 .vrev-list { display: grid; gap: 8px; }
 .vrev-row { display: flex; gap: 8px; align-items: center; }
 .vrev-row input { flex: 1; font-size: .85rem; }
