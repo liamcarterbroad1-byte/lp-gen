@@ -8,8 +8,14 @@ battle-tested template and returns the finished HTML to copy/paste.
 
 ## How it works
 
-1. You pick a **service type** and fill in the client brief.
+1. You pick a **page language** (Dutch or English), a **service type**, and fill
+   in the client brief.
 2. The browser substitutes your values into the template (all in `public/render.js`):
+   - **Language (Dutch / English)** — the template and all copy packs are written
+     in Dutch (the default). Flip the **Page language** toggle to *English* and the
+     whole page is rendered in English: every section heading, USP, roadmap step,
+     testimonial, FAQ, CTA, offer/guarantee line and the coach paragraph are
+     translated, per service type. Dutch output is unchanged.
    - **Service copy** — the template ships as *small group*; choosing another
      type rewrites the service-specific wording across the hero badge/subtext,
      USP cards, coach section, testimonials, FAQ, final-CTA urgency, and the

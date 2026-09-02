@@ -85,6 +85,43 @@
     ],
   };
 
+  // English roadmap steps (used when language === 'en').
+  var ROADMAP_EN = {
+    small_group: [
+      { t: 'Intake', d: 'We discuss your goals, experience and any injuries, so your training truly fits you.' },
+      { t: 'Trial class', d: "Experience right away what it's like to train in a small group with personal attention." },
+      { t: 'Get started', d: 'You train along in a small group, at a time that suits you.' },
+      { t: 'Reach your goal', d: 'With fixed sessions and personal attention you work purposefully toward your goal.' },
+    ],
+    personal_training: [
+      { t: 'Introduction', d: 'We discuss your goals, experience and injuries, so your 1-on-1 training fits perfectly.' },
+      { t: 'Trial session', d: "Experience right away what it's like to train 1-on-1 with full attention for your technique." },
+      { t: 'Get started', d: 'You start your 1-on-1 sessions at times that suit you.' },
+      { t: 'Reach your goal', d: 'Together we work purposefully toward your goal, with a tailored plan.' },
+    ],
+    online_coaching: [
+      { t: 'Intake call', d: 'In a short online call we discuss your goals, experience and what you need.' },
+      { t: 'Personal plan', d: 'You receive a tailored program with instructional videos, ready to start from your phone.' },
+      { t: 'Get started', d: 'You start with your personal program, straight from your phone.' },
+      { t: 'Reach your goal', d: 'With ongoing check-ins and adjustments you work purposefully toward your goal.' },
+    ],
+    pilates: [
+      { t: 'Introduction', d: 'We discuss your goals and any complaints, so every exercise suits your body.' },
+      { t: 'Trial class', d: 'Experience right away how calm and controlled Pilates is, with personal corrections.' },
+      { t: 'Get started', d: 'You train along in a small group, at a time that suits you.' },
+      { t: 'Reach your goal', d: 'With fixed sessions and personal corrections you build up calmly toward your goal.' },
+    ],
+  };
+
+  // English coach paragraph per service (keeps the PTF By Joep / Joep tokens so
+  // the client-name and coach-name substitutions still apply afterwards).
+  var COACH_PARA_EN = {
+    small_group: 'At <strong>PTF By Joep</strong> you never train anonymously. Because the groups stay small, Joep knows your goals, keeps your technique sharp and adapts the exercises to your level. Whether you’re just starting out or have trained for years — you train at your own pace, with guidance that moves you forward.',
+    personal_training: 'At <strong>PTF By Joep</strong> you never train anonymously. In your 1-on-1 sessions Joep knows your goals, keeps your technique sharp and adapts every exercise to your level. Whether you’re just starting out or have trained for years — you train at your own pace, with guidance that moves you forward.',
+    online_coaching: 'At <strong>PTF By Joep</strong> you’re never on your own. Through your personal online program Joep knows your goals, keeps your technique sharp and adjusts your plan to your level. Whether you’re just starting out or have trained for years — you train at your own pace, wherever you are, with guidance that moves you forward.',
+    pilates: 'At <strong>PTF By Joep</strong> you never train anonymously. Because the groups stay small, Joep knows your body and goals, keeps your posture sharp and adapts every exercise to your level. Whether you’re just starting out or have trained for years — you train at your own pace, with guidance that moves you forward.',
+  };
+
   // ── Service-specific copy packs (small group = baseline, applies nothing) ─────
   var SERVICE_COPY = {
     small_group: [],
@@ -269,11 +306,14 @@
     return html;
   }
 
-  function applyRoadmap(html, service, offer) {
-    var steps = (ROADMAP[service] || ROADMAP['small_group']).slice();
+  function applyRoadmap(html, service, offer, lang) {
+    var table = lang === 'en' ? ROADMAP_EN : ROADMAP;
+    var steps = (table[service] || table['small_group']).slice();
     // When an offer is entered, step 3 becomes the offer step.
     if (offer) {
-      steps[2] = { t: escapeHtml(offer), d: 'Ervaar het zelf en ontdek of het bij je past — vrijblijvend en zonder gedoe.' };
+      steps[2] = { t: escapeHtml(offer), d: lang === 'en'
+        ? 'Experience it yourself and see if it’s a fit — no obligation, no hassle.'
+        : 'Ervaar het zelf en ontdek of het bij je past — vrijblijvend en zonder gedoe.' };
     }
     ROADMAP_ORIG.forEach(function (orig, i) {
       html = replaceAll(html, '<h3>' + orig.t + '</h3>', '<h3>' + steps[i].t + '</h3>');
@@ -383,9 +423,10 @@
   var COACH_PNG = 'https://assets.cdn.filesafe.space/9fhovZYk1lVT2zNK01rv/media/69bd3dd68944bb8666d93138.png';
 
   // Replace the single coach card with two coach cards + a team paragraph.
-  function applyTwoCoaches(html, coach1Name, coach1Photo, coach2Name, coach2Photo) {
-    var c1 = firstNameOf(coach1Name) || 'je coach';
-    var c2 = firstNameOf(coach2Name) || 'je coach';
+  function applyTwoCoaches(html, coach1Name, coach1Photo, coach2Name, coach2Photo, lang) {
+    var en = lang === 'en';
+    var c1 = firstNameOf(coach1Name) || (en ? 'your coach' : 'je coach');
+    var c2 = firstNameOf(coach2Name) || (en ? 'your coach' : 'je coach');
     var p1 = coach1Photo || COACH_PNG;
 
     var duo =
@@ -401,11 +442,14 @@
       '</div>';
 
     html = html.replace(/<div class="ptf-coach-card ptf-reveal">[\s\S]*?<\/div>/, duo);
-    html = replaceAll(html, '<span class="ptf-kicker ptf-reveal">Jouw coach</span>', '<span class="ptf-kicker ptf-reveal">Jouw coaches</span>');
-    html = replaceAll(html, '<h2 class="ptf-reveal">Train onder begeleiding van Joep</h2>', '<h2 class="ptf-reveal">Train onder begeleiding van ' + escapeHtml(c1) + ' &amp; ' + escapeHtml(c2) + '</h2>');
+    html = replaceAll(html, '<span class="ptf-kicker ptf-reveal">Jouw coach</span>', '<span class="ptf-kicker ptf-reveal">' + (en ? 'Your coaches' : 'Jouw coaches') + '</span>');
+    html = replaceAll(html, '<h2 class="ptf-reveal">Train onder begeleiding van Joep</h2>', '<h2 class="ptf-reveal">' + (en ? 'Train with ' : 'Train onder begeleiding van ') + escapeHtml(c1) + ' &amp; ' + escapeHtml(c2) + '</h2>');
 
-    var teamPara = '<p class="ptf-coach-text ptf-reveal">Bij <strong>PTF By Joep</strong> train je nooit anoniem. ' +
-      escapeHtml(c1) + ' en ' + escapeHtml(c2) + ' kennen jouw doelen, houden je techniek scherp en passen de training aan op jouw niveau. Of je nu net begint of al jaren traint — jij traint op jouw tempo, met begeleiding die je vooruit helpt.</p>';
+    var teamPara = en
+      ? ('<p class="ptf-coach-text ptf-reveal">At <strong>PTF By Joep</strong> you never train anonymously. ' +
+          escapeHtml(c1) + ' and ' + escapeHtml(c2) + ' know your goals, keep your technique sharp and adapt the training to your level. Whether you’re just starting out or have trained for years — you train at your own pace, with guidance that moves you forward.</p>')
+      : ('<p class="ptf-coach-text ptf-reveal">Bij <strong>PTF By Joep</strong> train je nooit anoniem. ' +
+          escapeHtml(c1) + ' en ' + escapeHtml(c2) + ' kennen jouw doelen, houden je techniek scherp en passen de training aan op jouw niveau. Of je nu net begint of al jaren traint — jij traint op jouw tempo, met begeleiding die je vooruit helpt.</p>');
     html = html.replace(/<p class="ptf-coach-text ptf-reveal">[\s\S]*?<\/p>/, teamPara);
 
     var css = '#ptf-lp .ptf-coach-duo{display:flex;flex-wrap:wrap;gap:30px 16px;justify-content:center;max-width:520px;margin:0 auto 24px}#ptf-lp .ptf-coach-duo .ptf-coach-card{flex:1 1 200px;min-width:180px;max-width:240px;margin:0}';
@@ -413,10 +457,144 @@
     return html;
   }
 
+  // ── English translation ─────────────────────────────────────────────────────
+  // The template + copy packs are Dutch. When language === 'en' the Dutch
+  // pipeline runs as usual and this pass rewrites the resulting visible copy to
+  // English. Full sentences are translated first, then short labels, then the
+  // few fragments that wrap a user value (client/coach name, offer). The coach
+  // paragraph, two-coach block and roadmap are already emitted in English by
+  // their own functions, so nothing here has to unpick an embedded name.
+  var EN_PAIRS = [
+    // Hero / chrome
+    ['Direct online in te plannen — kies jouw moment', 'Book online instantly — choose your time'],
+    ['Stap 2 · Kies je trainingsmoment', 'Step 2 · Choose your time'],
+    // USP section (small group baseline)
+    ['Trainen met resultaat, zonder sportschool-gevoel', 'Real results, without the gym vibe'],
+    ['Kleine groepen, dus de coach ziet élke herhaling en stuurt direct bij.', 'Small groups, so the coach sees every rep and adjusts on the spot.'],
+    ['Elke oefening wordt aangepast — van eerste training tot gevorderd.', 'Every exercise is tailored — from first session to advanced.'],
+    ['Vaste trainingsmomenten en een stok achter de deur — zo blijf je gaan.', 'Fixed training times and a bit of accountability — so you keep going.'],
+    // USP variants (personal / online / pilates)
+    ['Trainen met resultaat, volledig op jou afgestemd', 'Real results, fully tailored to you'],
+    ['Trainen met resultaat, waar en wanneer jij wilt', 'Real results, wherever and whenever you want'],
+    ['Sterker, soepeler en in balans — met Pilates', 'Stronger, more supple and balanced — with Pilates'],
+    ['1-op-1 met je coach, dus élke herhaling wordt gezien en direct bijgestuurd.', '1-on-1 with your coach, so every rep is seen and adjusted right away.'],
+    ['Persoonlijke video-feedback, dus élke herhaling wordt gezien en direct bijgestuurd.', 'Personal video feedback, so every rep is seen and adjusted right away.'],
+    ['Kleine groepen, dus de instructeur ziet élke beweging en corrigeert direct.', 'Small groups, so the instructor sees every movement and corrects on the spot.'],
+    ['Vaste afspraken en een coach die je scherp houdt — zo blijf je gaan.', 'Fixed appointments and a coach who keeps you sharp — so you keep going.'],
+    ['Een vast schema en check-ins die je scherp houden — zo blijf je gaan.', 'A fixed plan and check-ins that keep you sharp — so you keep going.'],
+    ['Vaste momenten en persoonlijke correcties — zo bouw je rustig en blessurevrij op.', 'Fixed sessions and personal corrections — so you build up calmly and injury-free.'],
+    ['Structuur &amp; voortgang', 'Structure &amp; progress'],
+    ['Balans &amp; controle', 'Balance &amp; control'],
+    // Location
+    ['Goed bereikbaar en makkelijk te vinden.', 'Easily accessible and simple to find.'],
+    ['Gratis parkeren voor de deur en makkelijk bereikbaar vanuit heel de IJmond.', 'Free parking at the door and easy to reach from the whole region.'],
+    ['Train live met je coach of op je eigen moment — thuis, in de sportschool of onderweg. Alles via één app.', 'Train live with your coach or in your own time — at home, at the gym or on the go. All through one app.'],
+    ['Jouw coaching, volledig online', 'Your coaching, fully online'],
+    // Roadmap chrome
+    ['Van eerste kennismaking tot resultaat — in vier simpele stappen.', 'From first intro to results — in four simple steps.'],
+    ['Wat je kunt verwachten:', 'What to expect:'],
+    // Coach subheads
+    ['Persoonlijke aandacht, ook in de groep.', 'Personal attention, even in a group.'],
+    ['Persoonlijke aandacht, elke sessie.', 'Personal attention, every session.'],
+    ['Persoonlijke aandacht, ook op afstand.', 'Personal attention, even remotely.'],
+    ['Persoonlijke aandacht en correcties, elke les.', 'Personal attention and corrections, every class.'],
+    ['Train onder begeleiding van Joep', 'Train with Joep'],
+    // Testimonials
+    ['Wat leden zeggen', 'What members say'],
+    ['"Door de kleine groep krijg je echt persoonlijke begeleiding. Ik voel me fitter én sterker dan ooit."', '“Thanks to the small group you get real personal guidance. I feel fitter and stronger than ever.”'],
+    ['"De vaste momenten en de groep houden me op de been. Trainen is nu iets waar ik naar uitkijk."', '“The fixed times and the group keep me going. Training is now something I look forward to.”'],
+    ['"Door de 1-op-1 begeleiding krijg je echt persoonlijke aandacht. Ik voel me fitter én sterker dan ooit."', '“Thanks to the 1-on-1 coaching you get real personal attention. I feel fitter and stronger than ever.”'],
+    ['"De vaste afspraken en persoonlijke aandacht houden me op de been. Trainen is nu iets waar ik naar uitkijk."', '“The fixed appointments and personal attention keep me going. Training is now something I look forward to.”'],
+    ['"Zelfs online krijg je echt persoonlijke begeleiding. Ik voel me fitter én sterker dan ooit."', '“Even online you get real personal guidance. I feel fitter and stronger than ever.”'],
+    ['"Het schema en de check-ins houden me op de been. Trainen is nu iets waar ik naar uitkijk."', '“The plan and the check-ins keep me going. Training is now something I look forward to.”'],
+    ['"Door de kleine groep krijg ik echt persoonlijke correcties. Ik voel me sterker én soepeler dan ooit."', '“Thanks to the small group I get real personal corrections. I feel stronger and more supple than ever.”'],
+    ['"De rust en aandacht in de les houden me op de been. Pilates is nu mijn vaste moment."', '“The calm and attention in class keep me going. Pilates is now my fixed moment.”'],
+    // FAQ questions
+    ['Ik heb weinig ervaring, kan ik meedoen?', 'I have little experience, can I join?'],
+    ['Wat moet ik meenemen?', 'What should I bring?'],
+    ['Wat heb ik nodig om te starten?', 'What do I need to get started?'],
+    ['Hoe groot zijn de groepen?', 'How big are the groups?'],
+    ['Is dit echt helemaal privé?', 'Is this really completely private?'],
+    ['Hoe werkt de begeleiding op afstand?', 'How does remote coaching work?'],
+    ['Heb ik ervaring nodig?', 'Do I need experience?'],
+    ['Is de actie echt vrijblijvend?', 'Is the offer really non-binding?'],
+    ['Zit ik ergens aan vast?', 'Am I tied to anything?'],
+    // FAQ answers
+    ['Zeker. Elke oefening wordt aangepast op jouw niveau. Juist beginners halen veel uit de persoonlijke begeleiding in een kleine groep.', 'Absolutely. Every exercise is tailored to your level. Beginners especially benefit from the personal guidance in a small group.'],
+    ['Zeker. Elke oefening wordt aangepast op jouw niveau. Juist beginners halen veel uit de 1-op-1 begeleiding.', 'Absolutely. Every exercise is tailored to your level. Beginners especially benefit from the 1-on-1 coaching.'],
+    ['Zeker. Elke oefening wordt aangepast op jouw niveau. Juist beginners halen veel uit de persoonlijke online begeleiding.', 'Absolutely. Every exercise is tailored to your level. Beginners especially benefit from the personal online guidance.'],
+    ['Sportkleding, binnenschoenen, een handdoek en een flesje water. Voor de rest zorgen wij.', 'Sportswear, indoor shoes, a towel and a bottle of water. We’ll take care of the rest.'],
+    ['Een smartphone of laptop, een stukje ruimte en eventueel basis-materiaal. De rest krijg je via het programma.', 'A smartphone or laptop, a bit of space and maybe some basic equipment. You get the rest through the program.'],
+    ['We trainen bewust in kleine groepen, zodat er altijd persoonlijke aandacht is voor jouw techniek en doelen.', 'We deliberately train in small groups, so there’s always personal attention for your technique and goals.'],
+    ['Ja. Je traint 1-op-1 met je eigen coach, volledig gericht op jouw doelen en techniek.', 'Yes. You train 1-on-1 with your own coach, fully focused on your goals and technique.'],
+    ["Je krijgt een persoonlijk schema, instructievideo's en regelmatige check-ins, zodat je altijd weet wat je moet doen.", 'You get a personal plan, instructional videos and regular check-ins, so you always know what to do.'],
+    ['Nee. Pilates is voor elk niveau. We beginnen bij de basis en bouwen rustig op, met persoonlijke correcties.', 'No. Pilates is for every level. We start with the basics and build up calmly, with personal corrections.'],
+    ['Nee. Een kennismaking is volledig vrijblijvend. Je zit nergens aan vast en er wordt niets automatisch verlengd.', 'No. An intro is completely non-binding. You’re not tied to anything and nothing renews automatically.'],
+    // Final CTA
+    ['Kies een moment dat jou uitkomt en ontvang direct een bevestiging per mail. Binnen 2 minuten geregeld.', 'Choose a time that suits you and get instant confirmation by email. Done in 2 minutes.'],
+    ['Klaar om te starten?', 'Ready to get started?'],
+    ['Plekken per groep zijn beperkt', 'Spots per group are limited'],
+    ['Plekken per les zijn beperkt', 'Spots per class are limited'],
+    ['Er zijn beperkt plekken beschikbaar', 'Limited spots available'],
+    // Buttons / notes / micro-trust
+    ['Kies jouw moment', 'Choose your time'],
+    ['Plan je kennismaking', 'Book your intro'],
+    ['Binnen 2 minuten geregeld · Vrijblijvend', 'Done in 2 minutes · No obligation'],
+    ['✓ Vrijblijvend · ✓ Geen verplichtingen', '✓ No obligation · ✓ No commitments'],
+    ['✓ Direct bevestiging per mail', '✓ Instant confirmation by email'],
+    ['✓ Vrijblijvend geregeld', '✓ No obligation'],
+    // Subtext variants (no city coupling)
+    ['Kies hieronder een moment dat jou uitkomt. Je traint 1-op-1 met je eigen coach en ontvangt direct een bevestiging per mail.', 'Choose a time that suits you below. You train 1-on-1 with your own coach and receive instant confirmation by email.'],
+    ['Kies hieronder een moment voor je kennismaking. We bespreken online jouw doelen en je ontvangt direct een bevestiging per mail.', 'Choose a time for your intro below. We’ll discuss your goals online and you’ll receive instant confirmation by email.'],
+    ['Kies hieronder een moment dat jou uitkomt. Je traint in een kleine groep in onze studio en ontvangt direct een bevestiging per mail.', 'Choose a time that suits you below. You train in a small group at our studio and receive instant confirmation by email.'],
+    // Kickers (section eyebrows)
+    ['Zo werkt het', 'How it works'],
+    ['De studio', 'The studio'],
+    ['Online coaching', 'Online coaching'],
+    ['Ervaringen', 'Reviews'],
+    ['Goed om te weten', 'Good to know'],
+    ['Veelgestelde vragen', 'Frequently asked questions'],
+    // Short labels (after the sentences above)
+    ['Op jouw niveau', 'At your level'],
+    ['Samen volhouden', 'Keep it up together'],
+    ['Persoonlijke aandacht', 'Personal attention'],
+    ['Persoonlijke aanpak', 'Personal approach'],
+    ['1-op-1 begeleiding', '1-on-1 coaching'],
+    ['Voor elk niveau', 'For every level'],
+    ['Kleine groepen', 'Small groups'],
+    ['Geen verplichtingen', 'No commitments'],
+    ['Jouw coaches', 'Your coaches'],
+    ['Jouw coach', 'Your coach'],
+  ];
+
+  // Fragments that wrap a user-entered value; applied after the full pairs.
+  var EN_FRAG = [
+    ['Kies hieronder een moment dat jou uitkomt. ', 'Choose a time that suits you below. '],
+    ['Je traint samen in een kleine groep in onze studio in ', 'You train together in a small group at our studio in '],
+    ['Je traint samen in een kleine groep in onze studio', 'You train together in a small group at our studio'],
+    [' en ontvangt direct een bevestiging per mail.', ' and receive instant confirmation by email.'],
+    [' is volledig vrijblijvend. Je zit nergens aan vast en er wordt niets automatisch verlengd.', ' is completely non-binding. You’re not tied to anything and nothing renews automatically.'],
+    ['Train onder begeleiding van ', 'Train with '],
+    ['Onze studio in ', 'Our studio in '],
+    ['in onze studio in ', 'at our studio in '],
+    ['Onze studio', 'Our studio'],
+    ['onze studio', 'our studio'],
+    ['— Lid van ', '— Member of '],
+    ['Waarom ', 'Why '],
+    ['Probeer ', 'Try '],
+  ];
+
+  function toEnglish(html) {
+    EN_PAIRS.forEach(function (p) { html = replaceAll(html, p[0], p[1]); });
+    EN_FRAG.forEach(function (p) { html = replaceAll(html, p[0], p[1]); });
+    return html;
+  }
+
   function buildLandingPage(data) {
     data = data || {};
     var html = window.PTF_TEMPLATE;
     function val(k) { return data[k] == null ? '' : String(data[k]).trim(); }
+    var lang = data.language === 'en' ? 'en' : 'nl';
 
     var service = SERVICES.indexOf(data.service) >= 0 ? data.service : 'small_group';
     var isPhysical = PHYSICAL.indexOf(service) >= 0;
@@ -434,8 +612,15 @@
 
     // 3. Service copy pack + roadmap + optional offer/guarantee
     html = applyServicePack(html, service);
-    html = applyRoadmap(html, service, offer);
+    html = applyRoadmap(html, service, offer, lang);
     html = applyOfferGuarantee(html, offer, guarantee);
+
+    // 3b. English coach paragraph (keeps the PTF By Joep / Joep tokens intact so
+    // the name substitutions below still work). Overrides the pack's Dutch one.
+    if (lang === 'en') {
+      html = html.replace(/<p class="ptf-coach-text ptf-reveal">[\s\S]*?<\/p>/,
+        '<p class="ptf-coach-text ptf-reveal">' + (COACH_PARA_EN[service] || COACH_PARA_EN.small_group) + '</p>');
+    }
 
     // 4. Location: physical → city-aware studio text; online → mockup, no map
     if (isPhysical) {
@@ -447,7 +632,7 @@
     // 5. Two coaches (needs coach 1 name, coach 2 name + photo)
     var twoCoaches = data.twoCoaches === 'yes' || data.twoCoaches === 'on' || data.twoCoaches === true;
     if (twoCoaches && val('coachName') && val('coach2Name') && val('coach2Photo')) {
-      html = applyTwoCoaches(html, val('coachName'), val('photo2Url'), val('coach2Name'), val('coach2Photo'));
+      html = applyTwoCoaches(html, val('coachName'), val('photo2Url'), val('coach2Name'), val('coach2Photo'), lang);
     }
 
     // 6. Booking planner (single inline widget in the hero — CTAs scroll to it)
@@ -500,7 +685,11 @@
       if (fn) html = replaceAll(html, 'Joep', escapeHtml(fn));
     }
 
-    // 16. Advanced (detailed editor) — DOM post-processing, browser only
+    // 16. Language: translate the finished Dutch copy to English if requested.
+    // Runs after every substitution so client/coach names are already in place.
+    if (lang === 'en') html = toEnglish(html);
+
+    // 17. Advanced (detailed editor) — DOM post-processing, browser only
     if (typeof DOMParser !== 'undefined' && hasAdvanced(data.advanced)) {
       html = postProcess(html, data.advanced);
     }

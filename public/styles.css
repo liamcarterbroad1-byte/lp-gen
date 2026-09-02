@@ -107,6 +107,7 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 .slide-toggle .seg-btn.is-active { color: #fff; }
 .slide-thumb { position: absolute; z-index: 0; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); background: linear-gradient(180deg, var(--accent-soft), var(--accent)); border-radius: 999px; transition: transform .22s ease; }
 .slide-toggle.is-advanced .slide-thumb { transform: translateX(100%); }
+#langToggle.is-en .slide-thumb { transform: translateX(100%); }
 .mode-pane[hidden] { display: none; }
 
 /* 3-way slide toggle (review type) */

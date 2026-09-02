@@ -22,9 +22,12 @@ syncTwoCoaches();
 // its own list of URLs so switching back and forth doesn't lose them.
 const advanced = { off: {}, color: {}, text: {}, reviews: { mode: 'quote', pictures: [], videos: [] } };
 
+let uiLang = 'nl'; // 'nl' | 'en' — page output language
+
 function baseData() {
   const data = {};
   new FormData(form).forEach((value, name) => { data[name] = value; });
+  data.language = uiLang;
   return data;
 }
 function collectForm() {
@@ -106,6 +109,21 @@ modeToggle.addEventListener('click', (e) => {
     advPanel.hidden = true;
     form.hidden = false;
   }
+});
+
+// ── Page language toggle (Dutch ⇄ English) ───────────────────────────────────
+const langToggle = $('#langToggle');
+langToggle.addEventListener('click', (e) => {
+  const btn = e.target.closest('.seg-btn');
+  if (!btn) return;
+  uiLang = btn.dataset.lang === 'en' ? 'en' : 'nl';
+  langToggle.querySelectorAll('.seg-btn').forEach((b) => b.classList.toggle('is-active', b === btn));
+  langToggle.classList.toggle('is-en', uiLang === 'en');
+  // Standard copy changes with the language, so drop text overrides keyed to the
+  // old language and rebuild the advanced editor if it's open.
+  advanced.text = {};
+  if (!advPanel.hidden) renderEditor();
+  schedulePreview();
 });
 
 // ── Advanced editor rendering ────────────────────────────────────────────────
